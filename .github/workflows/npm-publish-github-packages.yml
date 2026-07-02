@@ -1,0 +1,36 @@
+# Ce flux de travail exécutera des tests à l'aide de Node, puis publiera un package sur GitHub Packages lorsqu'une version sera créée
+# Pour plus d'informations, voir : https://docs.github.com/en/actions/publishing-packages/publishing-nodejs-packages
+
+nom: Paquet Node.js
+
+sur:
+ libérateur:
+ types: [crééééé]
+
+emplois:
+ interprète:
+ se déchaîne: Ubuntu-dernier
+ cassettes:
+      - utilisations: actions/checkout@v4
+      - utilisations: actions/setup-node@v4
+ avec:
+ version nœud: 20
+      - courir: npm ci
+      - courir: test npm
+
+ éditeur-gpr:
+ besoins: interprète
+ se déchaîne: Ubuntu-dernier
+ autorisations:
+ contenu: lire
+ paquets: écrire
+ cassettes:
+      - utilisations: actions/checkout@v4
+      - utilisations: actions/setup-node@v4
+ avec:
+ version nœud: 20
+ url de registre: https://npm.pkg.github.com/
+      - courir: npm ci
+      - courir: publication npm
+ env:
+ NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
