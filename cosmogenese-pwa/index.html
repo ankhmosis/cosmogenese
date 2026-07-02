@@ -1,0 +1,2215 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>CosmoGénèse | Human Design & Astrologie Ésotérique</title>
+
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.webmanifest">
+    <meta name="theme-color" content="#050510">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="CosmoGénèse">
+    <link rel="icon" href="icon-192.png" type="image/png">
+    <link rel="apple-touch-icon" href="icon-192.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #050510;
+            color: #e2e8f0;
+            background-image:
+                radial-gradient(circle at 15% 50%, rgba(45, 20, 80, 0.4), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(20, 50, 90, 0.4), transparent 25%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        h1, h2, h3, h4, h5, .cinzel { font-family: 'Cinzel', serif; }
+        .glass-panel {
+            background: rgba(15, 15, 30, 0.65);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 215, 0, 0.18);
+            box-shadow: 0 4px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255,255,255,0.04);
+        }
+        .gold-text {
+            background: linear-gradient(to right, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+        }
+        .btn-gold {
+            background: linear-gradient(135deg, #bf953f, #aa771c);
+            color: #050510; transition: all 0.3s ease;
+        }
+        .btn-gold:hover {
+            background: linear-gradient(135deg, #fcf6ba, #bf953f);
+            transform: translateY(-2px); box-shadow: 0 0 20px rgba(191, 149, 63, 0.5);
+        }
+        .tab-active { border-bottom: 2px solid #bf953f; color: #fcf6ba !important; }
+        canvas {
+            border-radius: 8px;
+            background: radial-gradient(circle, rgba(20,20,40,0.8) 0%, rgba(5,5,16,0.9) 100%);
+        }
+        .spinner {
+            width: 50px; height: 50px;
+            border: 3px solid rgba(191, 149, 63, 0.3); border-radius: 50%;
+            border-top-color: #bf953f; animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(15, 15, 30, 0.8); }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #bf953f; }
+        input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            color: white; color-scheme: dark;
+        }
+        input:focus { outline: none; border-color: #bf953f; box-shadow: 0 0 8px rgba(191, 149, 63, 0.3); }
+
+        /* Stars background */
+        .stars {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 0; overflow: hidden;
+        }
+        .star {
+            position: absolute; background: white; border-radius: 50%;
+            animation: twinkle var(--dur, 3s) ease-in-out infinite alternate;
+            opacity: var(--op, 0.5);
+        }
+        @keyframes twinkle { from { opacity: 0.1; } to { opacity: 0.9; } }
+        main, header { position: relative; z-index: 1; }
+
+        /* Language selector */
+        .lang-btn {
+            padding: 4px 12px; border-radius: 999px; font-size: 0.75rem;
+            border: 1px solid rgba(255,215,0,0.3); cursor: pointer;
+            transition: all 0.2s; color: #a9a39a; background: transparent;
+        }
+        .lang-btn.active { background: rgba(191,149,63,0.2); color: #fcf6ba; border-color: #bf953f; }
+
+        /* Tarot cards */
+        .tarot-card {
+            background: linear-gradient(135deg, rgba(20,15,40,0.95), rgba(10,10,25,0.95));
+            border: 1px solid rgba(191,149,63,0.35);
+            border-radius: 16px; padding: 20px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+        .tarot-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(191,149,63,0.2);
+        }
+        .tarot-symbol {
+            font-size: 3rem; text-align: center;
+            filter: drop-shadow(0 0 10px rgba(191,149,63,0.6));
+        }
+        .tarot-arcane {
+            width: 100%; aspect-ratio: 2/3;
+            border-radius: 12px;
+            background: linear-gradient(160deg, rgba(30,15,60,0.95), rgba(10,5,25,0.95));
+            border: 2px solid rgba(191,149,63,0.5);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            gap: 10px; padding: 16px;
+            box-shadow: 0 0 20px rgba(191,149,63,0.15), inset 0 0 30px rgba(0,0,0,0.5);
+        }
+
+        /* Section divider */
+        .section-divider {
+            display: flex; align-items: center; gap: 16px;
+            margin: 32px 0;
+        }
+        .section-divider::before, .section-divider::after {
+            content: ''; flex: 1;
+            height: 1px; background: linear-gradient(to right, transparent, rgba(191,149,63,0.4), transparent);
+        }
+
+        /* Print / export button */
+        @media print { .no-print { display: none !important; } }
+
+        /* Glow effects */
+        .glow-gold { box-shadow: 0 0 15px rgba(191,149,63,0.3); }
+        .glow-purple { box-shadow: 0 0 15px rgba(139,92,246,0.3); }
+        .glow-blue { box-shadow: 0 0 15px rgba(59,130,246,0.3); }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+<!-- Stars -->
+<div class="stars" id="stars-bg"></div>
+
+<!-- Language Selector -->
+<div class="fixed top-4 right-4 z-50 flex gap-2 no-print">
+    <button class="lang-btn active" onclick="setLang('fr')">FR</button>
+    <button class="lang-btn" onclick="setLang('en')">EN</button>
+    <button class="lang-btn" onclick="setLang('ru')">RU</button>
+</div>
+
+<header class="text-center mb-12 mt-4">
+    <div class="flex justify-center mb-4">
+        <div style="font-size:2.5rem; filter: drop-shadow(0 0 20px rgba(191,149,63,0.8));">✦</div>
+    </div>
+    <h1 class="text-4xl md:text-6xl font-bold mb-4 gold-text tracking-widest" data-i18n="title">COSMOGÉNÈSE</h1>
+    <p class="text-slate-400 max-w-2xl mx-auto text-sm md:text-base leading-relaxed" data-i18n="subtitle">
+        Découvrez votre architecture cosmique. La synthèse absolue entre le Design Humain et l'Astrologie Ésotérique pour révéler le but profond de votre âme.
+    </p>
+</header>
+
+<main class="max-w-7xl mx-auto">
+
+    <!-- INPUT FORM -->
+    <section id="input-section" class="glass-panel rounded-2xl p-6 md:p-10 max-w-3xl mx-auto mb-12">
+        <h2 class="text-2xl cinzel text-center mb-2 text-white" data-i18n="form_title">Entrez vos données de naissance</h2>
+        <p class="text-center text-slate-500 text-sm mb-8" data-i18n="form_sub">Chaque donnée affine la précision de votre empreinte cosmique</p>
+        <form id="birth-form" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-xs uppercase tracking-wider text-slate-400 mb-2" data-i18n="label_dob">Date de naissance</label>
+                    <input type="date" id="dob" required class="w-full px-4 py-3 rounded-lg transition-all">
+                </div>
+                <div>
+                    <label class="block text-xs uppercase tracking-wider text-slate-400 mb-2" data-i18n="label_tob">Heure de naissance</label>
+                    <input type="time" id="tob" required class="w-full px-4 py-3 rounded-lg transition-all">
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-xs uppercase tracking-wider text-slate-400 mb-2" data-i18n="label_name">Prénom</label>
+                    <input type="text" id="firstname" placeholder="Votre prénom" class="w-full px-4 py-3 rounded-lg transition-all">
+                </div>
+                <div>
+                    <label class="block text-xs uppercase tracking-wider text-slate-400 mb-2" data-i18n="label_city">Lieu de naissance</label>
+                    <input type="text" id="city" required placeholder="Ex: Paris, France" class="w-full px-4 py-3 rounded-lg transition-all">
+                </div>
+            </div>
+            <button type="submit" class="w-full btn-gold font-bold uppercase tracking-wider py-4 rounded-lg mt-4 cinzel text-lg" data-i18n="btn_reveal">
+                ✦ Révéler mon empreinte cosmique
+            </button>
+        </form>
+    </section>
+
+    <!-- LOADING -->
+    <section id="loading-section" class="hidden flex-col items-center justify-center py-20">
+        <div class="spinner mb-6"></div>
+        <p class="cinzel text-xl text-slate-300 animate-pulse" data-i18n="loading">Alignement des configurations planétaires...</p>
+    </section>
+
+    <!-- RESULTS -->
+    <section id="results-section" class="hidden opacity-0 transition-opacity duration-1000">
+
+        <div class="text-center mb-8 border-b border-slate-700 pb-6">
+            <h3 class="text-3xl cinzel gold-text mb-2" id="res-name">Votre Profil Cosmique</h3>
+            <p class="text-slate-400 text-sm tracking-wider" id="res-details">Né(e) le -- à -- à --</p>
+            <button onclick="window.print()" class="mt-4 no-print text-xs text-slate-500 border border-slate-700 rounded-full px-4 py-1 hover:border-yellow-600 hover:text-yellow-500 transition-all" data-i18n="btn_export">
+                ↓ Exporter / Imprimer
+            </button>
+        </div>
+
+        <!-- TABS -->
+        <div class="flex justify-center flex-wrap gap-2 md:gap-4 mb-8 cinzel text-sm md:text-base border-b border-slate-800 pb-1">
+            <button id="tab-hd" class="pb-3 px-3 md:px-4 tab-active text-yellow-200 transition-colors" data-i18n="tab_hd">Design Humain</button>
+            <button id="tab-astro" class="pb-3 px-3 md:px-4 text-slate-500 transition-colors hover:text-yellow-200" data-i18n="tab_astro">Astrologie Ésotérique</button>
+            <button id="tab-bazi" class="pb-3 px-3 md:px-4 text-slate-500 transition-colors hover:text-yellow-200" data-i18n="tab_bazi">Quatre Piliers (BaZi)</button>
+            <button id="tab-jyotish" class="pb-3 px-3 md:px-4 text-slate-500 transition-colors hover:text-yellow-200" data-i18n="tab_jyotish">Thème Védique (Jyotish)</button>
+            <button id="tab-tarot" class="pb-3 px-3 md:px-4 text-slate-500 transition-colors hover:text-yellow-200" data-i18n="tab_tarot">Tarot de Naissance</button>
+            <button id="tab-synthesis" class="pb-3 px-3 md:px-4 text-slate-500 transition-colors hover:text-yellow-200" data-i18n="tab_synthesis">Synthèse Cosmique</button>
+        </div>
+
+        <!-- ===== TAB: HUMAN DESIGN ===== -->
+        <div id="content-hd" class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div class="glass-panel p-6 rounded-2xl flex flex-col items-center lg:col-span-5 h-fit">
+                <h4 class="cinzel text-xl text-white mb-4" data-i18n="bodygraph">Bodygraph</h4>
+                <div class="relative w-full aspect-square max-w-md">
+                    <canvas id="hd-canvas" class="w-full h-full"></canvas>
+                </div>
+                <div class="mt-6 w-full grid grid-cols-2 gap-3 text-sm text-center">
+                    <div class="bg-slate-800/50 p-3 rounded-lg border border-slate-700 glow-gold">
+                        <span class="block text-slate-400 text-[10px] uppercase mb-1" data-i18n="lbl_type">Type</span>
+                        <span id="hd-type" class="font-bold text-yellow-300">--</span>
+                    </div>
+                    <div class="bg-slate-800/50 p-3 rounded-lg border border-slate-700">
+                        <span class="block text-slate-400 text-[10px] uppercase mb-1" data-i18n="lbl_profile">Profil</span>
+                        <span id="hd-profile" class="font-bold text-white">--</span>
+                    </div>
+                    <div class="bg-slate-800/50 p-3 rounded-lg border border-slate-700">
+                        <span class="block text-slate-400 text-[10px] uppercase mb-1" data-i18n="lbl_authority">Autorité</span>
+                        <span id="hd-authority" class="font-bold text-white text-xs">--</span>
+                    </div>
+                    <div class="bg-slate-800/50 p-3 rounded-lg border border-slate-700">
+                        <span class="block text-slate-400 text-[10px] uppercase mb-1" data-i18n="lbl_definition">Définition</span>
+                        <span id="hd-definition" class="font-bold text-white">--</span>
+                    </div>
+                    <div class="bg-red-900/20 p-3 rounded-lg border border-red-900/40">
+                        <span class="block text-slate-400 text-[10px] uppercase mb-1" data-i18n="lbl_notself">Non-Soi</span>
+                        <span id="hd-notself" class="font-bold text-red-400 text-xs">--</span>
+                    </div>
+                    <div class="bg-emerald-900/20 p-3 rounded-lg border border-emerald-900/40">
+                        <span class="block text-slate-400 text-[10px] uppercase mb-1" data-i18n="lbl_signature">Signature</span>
+                        <span id="hd-signature" class="font-bold text-emerald-400 text-xs">--</span>
+                    </div>
+                    <div class="bg-slate-800/50 p-3 rounded-lg border border-slate-700 col-span-2">
+                        <span class="block text-slate-400 text-[10px] uppercase tracking-wider mb-1" data-i18n="lbl_cross">Croix d'Incarnation</span>
+                        <span id="hd-cross" class="font-bold text-emerald-300 text-xs">--</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-panel p-6 md:p-8 rounded-2xl overflow-y-auto lg:col-span-7" style="max-height:900px">
+                <h4 class="cinzel text-2xl gold-text mb-6 flex items-center border-b border-slate-700/50 pb-4">
+                    <svg class="w-6 h-6 mr-3 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    <span data-i18n="hd_section_title">Mécanique de l'Aura</span>
+                </h4>
+                <div class="space-y-8 text-slate-300 leading-relaxed text-sm md:text-base">
+                    <div class="bg-slate-800/30 p-5 rounded-xl border border-slate-700/50">
+                        <h5 class="text-lg font-bold text-white mb-3 cinzel" data-i18n="your_type">Votre Type Énergétique</h5>
+                        <p id="interp-type" class="mb-4">...</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-red-900/10 border-l-2 border-red-500 p-3 rounded-r">
+                                <span class="block text-xs uppercase tracking-wider text-red-400 mb-1 font-bold" data-i18n="not_self_alert">Alerte : Le Non-Soi</span>
+                                <p id="interp-notself-desc" class="text-sm text-slate-300">...</p>
+                            </div>
+                            <div class="bg-emerald-900/10 border-l-2 border-emerald-500 p-3 rounded-r">
+                                <span class="block text-xs uppercase tracking-wider text-emerald-400 mb-1 font-bold" data-i18n="signature_align">Alignement : La Signature</span>
+                                <p id="interp-signature-desc" class="text-sm text-slate-300">...</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-emerald-900/10 border-l-4 border-emerald-500 p-5 rounded-r-xl">
+                        <h5 class="text-lg font-bold text-emerald-400 mb-2 cinzel" data-i18n="incarnation_cross">Votre Croix d'Incarnation (Le Dessein)</h5>
+                        <p id="interp-hd-cross" class="text-slate-300">...</p>
+                    </div>
+                    <div>
+                        <h5 class="text-lg font-bold text-white mb-4 cinzel border-b border-slate-700/50 pb-2" data-i18n="duality">La Dualité : Personnalité & Design</h5>
+                        <div id="interp-duality" class="space-y-4"></div>
+                    </div>
+                    <div class="mt-8 mb-6">
+                        <h5 class="text-lg font-bold text-white mb-4 cinzel border-b border-slate-700/50 pb-2" data-i18n="definition_flow">La Définition (Le Flux Énergétique)</h5>
+                        <div class="bg-blue-900/10 border-l-4 border-blue-500 p-5 rounded-r-xl shadow-sm">
+                            <h6 id="interp-definition-name" class="font-bold text-blue-300 mb-2 uppercase tracking-wider text-xs">...</h6>
+                            <p id="interp-definition-desc" class="text-sm text-slate-300 leading-relaxed">...</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                        <div>
+                            <h5 class="text-base font-bold text-yellow-400 mb-3 cinzel border-b border-yellow-400/20 pb-2" data-i18n="defined_centers">Centres Définis (Forces fixes)</h5>
+                            <ul id="interp-defined-centers" class="space-y-4"></ul>
+                        </div>
+                        <div>
+                            <h5 class="text-base font-bold text-blue-300 mb-3 cinzel border-b border-blue-300/20 pb-2" data-i18n="undefined_centers">Centres Non-Définis (Apprentissages)</h5>
+                            <ul id="interp-undefined-centers" class="space-y-4 text-slate-400"></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== TAB: ASTROLOGY ===== -->
+        <div id="content-astro" class="grid grid-cols-1 lg:grid-cols-12 gap-8 hidden">
+            <div class="glass-panel p-6 rounded-2xl flex flex-col items-center lg:col-span-5 h-fit">
+                <h4 class="cinzel text-xl text-white mb-4" data-i18n="esoteric_chart">Charte Ésotérique</h4>
+                <div class="relative w-full aspect-square max-w-md">
+                    <canvas id="astro-canvas" class="w-full h-full"></canvas>
+                </div>
+                <div class="mt-6 w-full grid grid-cols-3 gap-2 text-sm text-center">
+                    <div class="bg-slate-800/50 p-2 rounded border border-slate-700">
+                        <span class="block text-slate-400 text-[10px] uppercase mb-1" data-i18n="lbl_sun">Soleil</span>
+                        <span id="ast-sun" class="font-bold text-yellow-200">--</span>
+                    </div>
+                    <div class="bg-slate-800/50 p-2 rounded border border-slate-700">
+                        <span class="block text-slate-400 text-[10px] uppercase mb-1" data-i18n="lbl_moon">Lune</span>
+                        <span id="ast-moon" class="font-bold text-blue-200">--</span>
+                    </div>
+                    <div class="bg-slate-800/50 p-2 rounded border border-slate-700">
+                        <span class="block text-slate-400 text-[10px] uppercase mb-1" data-i18n="lbl_asc">Ascendant</span>
+                        <span id="ast-asc" class="font-bold text-red-200">--</span>
+                    </div>
+                </div>
+                <div class="mt-2 w-full p-3 bg-slate-800/50 border border-slate-700 rounded text-center">
+                    <span class="block text-slate-400 text-[10px] uppercase tracking-wider mb-1" data-i18n="lbl_nodes">Axe Nodal</span>
+                    <span id="ast-nodes" class="font-bold text-emerald-300 text-xs">--</span>
+                </div>
+                <div class="mt-4 w-full p-4 bg-indigo-900/30 border border-indigo-500/30 rounded text-center shadow-inner">
+                    <span class="block text-indigo-300 text-[10px] uppercase tracking-wider mb-1" data-i18n="lbl_ray">Rayon d'Âme Prédominant</span>
+                    <span id="ast-ray" class="font-bold text-white text-lg cinzel gold-text">--</span>
+                </div>
+            </div>
+            <div class="glass-panel p-6 md:p-8 rounded-2xl overflow-y-auto lg:col-span-7" style="max-height:900px">
+                <h4 class="cinzel text-2xl gold-text mb-6 flex items-center border-b border-slate-700/50 pb-4">
+                    <svg class="w-6 h-6 mr-3 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>
+                    <span data-i18n="soul_path">Le Chemin de l'Âme</span>
+                </h4>
+                <div class="space-y-8 text-slate-300 leading-relaxed text-sm md:text-base">
+                    <p class="italic border-l-2 border-indigo-500 pl-4 py-1 text-slate-400 text-sm bg-indigo-900/10 rounded-r" data-i18n="astro_intro">
+                        L'astrologie ésotérique (issue d'Alice Bailey) se concentre sur le but de l'âme plutôt que sur l'ego.
+                    </p>
+                    <div id="interp-nodes-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-slate-800/50 border border-slate-700 p-5 rounded-xl">
+                            <h5 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3">☋ <span data-i18n="karma">Le Karma (Nœud Sud)</span></h5>
+                            <div id="interp-node-south" class="text-sm"></div>
+                        </div>
+                        <div class="bg-emerald-900/20 border border-emerald-500/30 p-5 rounded-xl">
+                            <h5 class="text-sm font-bold text-emerald-400 uppercase tracking-wider mb-3">☊ <span data-i18n="dharma">Le Dharma (Nœud Nord)</span></h5>
+                            <div id="interp-node-north" class="text-sm text-emerald-100"></div>
+                        </div>
+                    </div>
+                    <div class="bg-slate-800/30 p-5 rounded-xl border border-slate-700/50 mt-6">
+                        <h5 class="text-lg font-bold text-white mb-2 cinzel" data-i18n="esoteric_ruler">L'Ascendant et le Régent Ésotérique</h5>
+                        <p id="interp-esoteric-ruler"></p>
+                    </div>
+                    <div class="bg-slate-800/30 p-5 rounded-xl border border-slate-700/50">
+                        <h5 class="text-lg font-bold text-white mb-2 cinzel" data-i18n="sun_moon_alchemy">L'Alchimie Soleil / Lune</h5>
+                        <p id="interp-sun-moon"></p>
+                    </div>
+                    <div class="bg-indigo-900/20 p-5 rounded-xl border border-indigo-500/20">
+                        <h5 class="text-lg font-bold text-indigo-300 mb-2 cinzel" data-i18n="soul_ray">Votre Rayon d'Âme</h5>
+                        <p id="interp-soul-ray"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== TAB: QUATRE PILIERS DE LA DESTINÉE (BAZI) ===== -->
+        <div id="content-bazi" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div class="glass-panel p-6 rounded-2xl flex flex-col items-center lg:col-span-5 h-fit">
+                <h4 class="cinzel text-xl text-white mb-4" data-i18n="bazi_pillars_title">Les Quatre Piliers</h4>
+                <div id="bazi-pillars" class="grid grid-cols-4 gap-2 w-full text-center"></div>
+                <div class="mt-6 w-full">
+                    <span class="block text-slate-400 text-[10px] uppercase tracking-wider mb-2 text-center" data-i18n="bazi_elements_balance">Balance des Cinq Éléments</span>
+                    <div id="bazi-elements-bar" class="space-y-2"></div>
+                </div>
+                <div class="mt-6 w-full grid grid-cols-2 gap-3 text-sm text-center">
+                    <div class="bg-slate-800/50 p-3 rounded-lg border border-slate-700 glow-gold col-span-2">
+                        <span class="block text-slate-400 text-[10px] uppercase mb-1" data-i18n="bazi_daymaster">Maître du Jour</span>
+                        <span id="bazi-daymaster" class="font-bold text-yellow-300">--</span>
+                    </div>
+                    <div class="bg-slate-800/50 p-3 rounded-lg border border-slate-700">
+                        <span class="block text-slate-400 text-[10px] uppercase mb-1" data-i18n="bazi_animal">Signe Animal</span>
+                        <span id="bazi-animal" class="font-bold text-white">--</span>
+                    </div>
+                    <div class="bg-slate-800/50 p-3 rounded-lg border border-slate-700">
+                        <span class="block text-slate-400 text-[10px] uppercase mb-1" data-i18n="bazi_dominant">Élément Dominant</span>
+                        <span id="bazi-dominant" class="font-bold text-white">--</span>
+                    </div>
+                    <div class="bg-red-900/20 p-3 rounded-lg border border-red-900/40">
+                        <span class="block text-slate-400 text-[10px] uppercase mb-1" data-i18n="bazi_lacking">Élément Manquant</span>
+                        <span id="bazi-lacking" class="font-bold text-red-400">--</span>
+                    </div>
+                    <div class="bg-emerald-900/20 p-3 rounded-lg border border-emerald-900/40">
+                        <span class="block text-slate-400 text-[10px] uppercase mb-1" data-i18n="bazi_favorable">Élément Favorable</span>
+                        <span id="bazi-favorable" class="font-bold text-emerald-400">--</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-panel p-6 md:p-8 rounded-2xl overflow-y-auto lg:col-span-7" style="max-height:900px">
+                <h4 class="cinzel text-2xl gold-text mb-6 flex items-center border-b border-slate-700/50 pb-4">
+                    <svg class="w-6 h-6 mr-3 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v18m9-9H3"></path></svg>
+                    <span data-i18n="bazi_section_title">La Carte Énergétique Chinoise</span>
+                </h4>
+                <div class="space-y-8 text-slate-300 leading-relaxed text-sm md:text-base">
+                    <p class="italic border-l-2 border-yellow-500 pl-4 py-1 text-slate-400 text-sm bg-yellow-900/10 rounded-r" data-i18n="bazi_intro">
+                        Les Quatre Piliers de la Destinée (BaZi, 八字) sont un système chinois millénaire qui lit votre carte énergétique à travers quatre paires de Tiges Célestes et de Branches Terrestres — celles de l'année, du mois, du jour et de l'heure de votre naissance.
+                    </p>
+                    <div class="bg-slate-800/30 p-5 rounded-xl border border-slate-700/50">
+                        <h5 class="text-lg font-bold text-white mb-3 cinzel" data-i18n="bazi_daymaster_title">Votre Maître du Jour (日主)</h5>
+                        <p id="interp-bazi-daymaster" class="mb-4">...</p>
+                    </div>
+                    <div id="bazi-pillars-interp" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                    <div class="bg-slate-800/30 p-5 rounded-xl border border-slate-700/50">
+                        <h5 class="text-lg font-bold text-white mb-2 cinzel" data-i18n="bazi_elements_title">L'Équilibre des Cinq Éléments (Wu Xing)</h5>
+                        <p id="interp-bazi-elements" class="text-slate-300">...</p>
+                    </div>
+                    <div class="bg-emerald-900/10 border-l-4 border-emerald-500 p-5 rounded-r-xl">
+                        <h5 class="text-lg font-bold text-emerald-400 mb-2 cinzel" data-i18n="bazi_favorable_title">Votre Élément Favorable (Yong Shen)</h5>
+                        <p id="interp-bazi-favorable" class="text-slate-300">...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== TAB: THÈME NATAL VÉDIQUE (JYOTISH) ===== -->
+        <div id="content-jyotish" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div class="glass-panel p-6 rounded-2xl flex flex-col items-center lg:col-span-5 h-fit">
+                <h4 class="cinzel text-xl text-white mb-4" data-i18n="jyotish_chart_title">Rāśi Chakra (Thème Natal)</h4>
+                <div class="relative w-full aspect-square max-w-md">
+                    <svg id="jyotish-chart" viewBox="0 0 300 300" class="w-full h-full"></svg>
+                </div>
+                <div class="mt-6 w-full grid grid-cols-2 gap-3 text-sm text-center">
+                    <div class="bg-slate-800/50 p-3 rounded-lg border border-slate-700 glow-purple col-span-2">
+                        <span class="block text-slate-400 text-[10px] uppercase mb-1" data-i18n="jyotish_lagna">Lagna (Ascendant Sidéral)</span>
+                        <span id="jyotish-lagna" class="font-bold text-purple-300">--</span>
+                    </div>
+                    <div class="bg-slate-800/50 p-3 rounded-lg border border-slate-700">
+                        <span class="block text-slate-400 text-[10px] uppercase mb-1" data-i18n="jyotish_rashi">Rāśi (Signe Lunaire)</span>
+                        <span id="jyotish-rashi" class="font-bold text-white">--</span>
+                    </div>
+                    <div class="bg-slate-800/50 p-3 rounded-lg border border-slate-700">
+                        <span class="block text-slate-400 text-[10px] uppercase mb-1" data-i18n="jyotish_nakshatra">Nakshatra</span>
+                        <span id="jyotish-nakshatra" class="font-bold text-white text-xs">--</span>
+                    </div>
+                    <div class="bg-indigo-900/30 p-3 rounded-lg border border-indigo-500/30 col-span-2">
+                        <span class="block text-slate-400 text-[10px] uppercase mb-1" data-i18n="jyotish_dasha">Mahādaśā Actuelle</span>
+                        <span id="jyotish-dasha" class="font-bold text-indigo-300">--</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-panel p-6 md:p-8 rounded-2xl overflow-y-auto lg:col-span-7" style="max-height:900px">
+                <h4 class="cinzel text-2xl gold-text mb-6 flex items-center border-b border-slate-700/50 pb-4">
+                    <svg class="w-6 h-6 mr-3 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3l1.9 5.8H20l-4.9 3.6 1.9 5.8L12 14.6l-4.9 3.6 1.9-5.8L3 8.8h6.1z"></path></svg>
+                    <span data-i18n="jyotish_section_title">La Roue Sidérale de l'Âme</span>
+                </h4>
+                <div class="space-y-8 text-slate-300 leading-relaxed text-sm md:text-base">
+                    <p class="italic border-l-2 border-purple-500 pl-4 py-1 text-slate-400 text-sm bg-purple-900/10 rounded-r" data-i18n="jyotish_intro">
+                        Le Jyotish (ज्योतिष), astrologie védique de l'Inde, utilise le zodiaque sidéral — ajusté de l'ayanamsa — pour révéler le karma inscrit dans la position réelle des étoiles au moment de votre naissance.
+                    </p>
+                    <div class="bg-purple-900/10 p-5 rounded-xl border border-purple-500/20">
+                        <h5 class="text-lg font-bold text-purple-300 mb-2 cinzel" data-i18n="jyotish_lagna_title">Le Lagna : Le Corps et le Chemin</h5>
+                        <p id="interp-jyotish-lagna">...</p>
+                    </div>
+                    <div class="bg-slate-800/30 p-5 rounded-xl border border-slate-700/50">
+                        <h5 class="text-lg font-bold text-white mb-2 cinzel" data-i18n="jyotish_rashi_title">Le Rāśi Lunaire : L'Esprit et les Émotions</h5>
+                        <p id="interp-jyotish-rashi">...</p>
+                    </div>
+                    <div class="bg-slate-800/30 p-5 rounded-xl border border-slate-700/50">
+                        <h5 class="text-lg font-bold text-white mb-2 cinzel" data-i18n="jyotish_nakshatra_title">Le Nakshatra : L'Étoile de Naissance</h5>
+                        <p id="interp-jyotish-nakshatra">...</p>
+                    </div>
+                    <div class="bg-indigo-900/20 p-5 rounded-xl border border-indigo-500/20">
+                        <h5 class="text-lg font-bold text-indigo-300 mb-2 cinzel" data-i18n="jyotish_dasha_title">La Mahādaśā : Le Cycle Planétaire Actuel</h5>
+                        <p id="interp-jyotish-dasha">...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== TAB: TAROT DE NAISSANCE ===== -->
+        <div id="content-tarot" class="hidden">
+            <div class="text-center mb-10">
+                <p class="text-slate-400 max-w-2xl mx-auto text-sm leading-relaxed" data-i18n="tarot_intro">
+                    Le Tarot de Naissance révèle l'archétype de votre âme, le défi karmique que vous portez et la mission secrète inscrite dans vos données de naissance.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
+                <!-- Carte d'âme -->
+                <div class="tarot-card flex flex-col items-center text-center">
+                    <p class="text-xs uppercase tracking-widest text-yellow-600 mb-3" data-i18n="soul_card">Carte de l'Âme</p>
+                    <div class="tarot-arcane mb-4">
+                        <div class="tarot-symbol" id="tarot-soul-symbol">☉</div>
+                        <h3 class="cinzel text-white text-lg" id="tarot-soul-name">--</h3>
+                        <p class="text-slate-400 text-xs" id="tarot-soul-number">--</p>
+                    </div>
+                    <p class="text-slate-300 text-sm leading-relaxed" id="tarot-soul-desc">...</p>
+                </div>
+                <!-- Carte de personnalité -->
+                <div class="tarot-card flex flex-col items-center text-center">
+                    <p class="text-xs uppercase tracking-widest text-blue-400 mb-3" data-i18n="personality_card">Carte de la Personnalité</p>
+                    <div class="tarot-arcane mb-4" style="border-color: rgba(59,130,246,0.5);">
+                        <div class="tarot-symbol" id="tarot-pers-symbol">☽</div>
+                        <h3 class="cinzel text-white text-lg" id="tarot-pers-name">--</h3>
+                        <p class="text-slate-400 text-xs" id="tarot-pers-number">--</p>
+                    </div>
+                    <p class="text-slate-300 text-sm leading-relaxed" id="tarot-pers-desc">...</p>
+                </div>
+                <!-- Carte de l'année -->
+                <div class="tarot-card flex flex-col items-center text-center">
+                    <p class="text-xs uppercase tracking-widest text-emerald-400 mb-3" data-i18n="year_card">Carte de l'Année</p>
+                    <div class="tarot-arcane mb-4" style="border-color: rgba(16,185,129,0.5);">
+                        <div class="tarot-symbol" id="tarot-year-symbol">✦</div>
+                        <h3 class="cinzel text-white text-lg" id="tarot-year-name">--</h3>
+                        <p class="text-slate-400 text-xs" id="tarot-year-number">--</p>
+                    </div>
+                    <p class="text-slate-300 text-sm leading-relaxed" id="tarot-year-desc">...</p>
+                </div>
+            </div>
+
+            <!-- Chemin de vie numéro -->
+            <div class="glass-panel rounded-2xl p-8 mb-8 max-w-2xl mx-auto text-center">
+                <h4 class="cinzel text-xl gold-text mb-2" data-i18n="life_path">Chemin de Vie & Nombre Maître</h4>
+                <div class="text-6xl my-6 gold-text cinzel font-bold" id="tarot-lifenum">--</div>
+                <p class="text-slate-300 text-sm leading-relaxed" id="tarot-lifenum-desc">...</p>
+            </div>
+
+            <!-- Synthèse tarot -->
+            <div class="glass-panel rounded-2xl p-8">
+                <h4 class="cinzel text-xl text-white mb-6 border-b border-slate-700 pb-3" data-i18n="tarot_message">Le Message des Arcanes</h4>
+                <div id="tarot-synthesis" class="space-y-4 text-slate-300 text-sm leading-relaxed"></div>
+            </div>
+        </div>
+
+        <!-- ===== TAB: SYNTHÈSE COSMIQUE ===== -->
+        <div id="content-synthesis" class="hidden">
+            <div class="glass-panel rounded-2xl p-8 mb-8 text-center">
+                <div style="font-size:3rem; margin-bottom:12px; filter:drop-shadow(0 0 20px rgba(191,149,63,0.7));">◉</div>
+                <h4 class="cinzel text-2xl gold-text mb-3" data-i18n="synthesis_title">Votre Portrait Cosmique Complet</h4>
+                <p class="text-slate-400 text-sm max-w-2xl mx-auto" data-i18n="synthesis_sub">La convergence de votre Design Humain, Astrologie Ésotérique et Tarot de Naissance</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="glass-panel rounded-xl p-6 text-center border-t-2 border-yellow-600">
+                    <div class="text-3xl mb-3">⬡</div>
+                    <h5 class="cinzel text-white mb-2" data-i18n="synth_mission">Votre Mission</h5>
+                    <p id="synth-mission" class="text-slate-300 text-sm leading-relaxed">...</p>
+                </div>
+                <div class="glass-panel rounded-xl p-6 text-center border-t-2 border-purple-600">
+                    <div class="text-3xl mb-3">🜁</div>
+                    <h5 class="cinzel text-white mb-2" data-i18n="synth_gift">Votre Don Unique</h5>
+                    <p id="synth-gift" class="text-slate-300 text-sm leading-relaxed">...</p>
+                </div>
+                <div class="glass-panel rounded-xl p-6 text-center border-t-2 border-emerald-600">
+                    <div class="text-3xl mb-3">🜃</div>
+                    <h5 class="cinzel text-white mb-2" data-i18n="synth_shadow">Votre Ombre à Intégrer</h5>
+                    <p id="synth-shadow" class="text-slate-300 text-sm leading-relaxed">...</p>
+                </div>
+            </div>
+
+            <div class="glass-panel rounded-2xl p-8 mb-8">
+                <h4 class="cinzel text-xl gold-text mb-6 border-b border-slate-700 pb-3" data-i18n="synth_mantra">Votre Mantra Cosmique</h4>
+                <div id="synth-mantra" class="text-center text-xl cinzel text-white leading-relaxed py-4 border border-yellow-900/30 rounded-xl bg-yellow-950/10">...</div>
+            </div>
+
+            <div class="glass-panel rounded-2xl p-8 mb-8">
+                <h4 class="cinzel text-xl gold-text mb-6 border-b border-slate-700 pb-3" data-i18n="synth_alignment">Votre Alignement Pratique</h4>
+                <div id="synth-alignment" class="space-y-4"></div>
+            </div>
+
+            <div class="glass-panel rounded-2xl p-8">
+                <h4 class="cinzel text-xl gold-text mb-6 border-b border-slate-700 pb-3" data-i18n="synth_periods">Vos Grandes Périodes de Vie</h4>
+                <div id="synth-periods" class="space-y-4"></div>
+            </div>
+        </div>
+
+    </section>
+</main>
+
+<footer class="text-center mt-16 mb-8 text-slate-600 text-xs no-print">
+    <p>✦ COSMOGÉNÈSE ✦ — <span data-i18n="footer">Usage spirituel et introspectif uniquement</span></p>
+</footer>
+
+<script>
+// =============================================
+// TRANSLATIONS
+// =============================================
+const TRANSLATIONS = {
+    fr: {
+        title: "COSMOGÉNÈSE", subtitle: "Découvrez votre architecture cosmique. La synthèse absolue entre le Design Humain et l'Astrologie Ésotérique pour révéler le but profond de votre âme.",
+        form_title: "Entrez vos données de naissance", form_sub: "Chaque donnée affine la précision de votre empreinte cosmique",
+        label_dob: "Date de naissance", label_tob: "Heure de naissance", label_name: "Prénom", label_city: "Lieu de naissance",
+        btn_reveal: "✦ Révéler mon empreinte cosmique", btn_export: "↓ Exporter / Imprimer",
+        loading: "Alignement des configurations planétaires...",
+        tab_hd: "Design Humain", tab_astro: "Astrologie Ésotérique", tab_bazi: "Quatre Piliers (BaZi)", tab_jyotish: "Thème Védique (Jyotish)", tab_tarot: "Tarot de Naissance", tab_synthesis: "Synthèse Cosmique",
+        bazi_pillars_title: "Les Quatre Piliers", bazi_elements_balance: "Balance des Cinq Éléments", bazi_daymaster: "Maître du Jour",
+        bazi_animal: "Signe Animal", bazi_dominant: "Élément Dominant", bazi_lacking: "Élément Manquant", bazi_favorable: "Élément Favorable",
+        bazi_section_title: "La Carte Énergétique Chinoise",
+        bazi_intro: "Les Quatre Piliers de la Destinée (BaZi, 八字) sont un système chinois millénaire qui lit votre carte énergétique à travers quatre paires de Tiges Célestes et de Branches Terrestres — celles de l'année, du mois, du jour et de l'heure de votre naissance.",
+        bazi_daymaster_title: "Votre Maître du Jour (日主)", bazi_elements_title: "L'Équilibre des Cinq Éléments (Wu Xing)", bazi_favorable_title: "Votre Élément Favorable (Yong Shen)",
+        jyotish_chart_title: "Rāśi Chakra (Thème Natal)", jyotish_lagna: "Lagna (Ascendant Sidéral)", jyotish_rashi: "Rāśi (Signe Lunaire)",
+        jyotish_nakshatra: "Nakshatra", jyotish_dasha: "Mahādaśā Actuelle", jyotish_section_title: "La Roue Sidérale de l'Âme",
+        jyotish_intro: "Le Jyotish (ज्योतिष), astrologie védique de l'Inde, utilise le zodiaque sidéral — ajusté de l'ayanamsa — pour révéler le karma inscrit dans la position réelle des étoiles au moment de votre naissance.",
+        jyotish_lagna_title: "Le Lagna : Le Corps et le Chemin", jyotish_rashi_title: "Le Rāśi Lunaire : L'Esprit et les Émotions",
+        jyotish_nakshatra_title: "Le Nakshatra : L'Étoile de Naissance", jyotish_dasha_title: "La Mahādaśā : Le Cycle Planétaire Actuel",
+        bodygraph: "Bodygraph", lbl_type: "Type", lbl_profile: "Profil", lbl_authority: "Autorité", lbl_definition: "Définition",
+        lbl_notself: "Non-Soi", lbl_signature: "Signature", lbl_cross: "Croix d'Incarnation",
+        hd_section_title: "Mécanique de l'Aura", your_type: "Votre Type Énergétique",
+        not_self_alert: "Alerte : Le Non-Soi", signature_align: "Alignement : La Signature",
+        incarnation_cross: "Votre Croix d'Incarnation (Le Dessein)", duality: "La Dualité : Personnalité & Design",
+        definition_flow: "La Définition (Le Flux Énergétique)", defined_centers: "Centres Définis (Forces fixes)",
+        undefined_centers: "Centres Non-Définis (Apprentissages)", esoteric_chart: "Charte Ésotérique",
+        lbl_sun: "Soleil", lbl_moon: "Lune", lbl_asc: "Ascendant", lbl_nodes: "Axe Nodal", lbl_ray: "Rayon d'Âme Prédominant",
+        soul_path: "Le Chemin de l'Âme", karma: "Le Karma (Nœud Sud)", dharma: "Le Dharma (Nœud Nord)",
+        esoteric_ruler: "L'Ascendant et le Régent Ésotérique", sun_moon_alchemy: "L'Alchimie Soleil / Lune",
+        soul_ray: "Votre Rayon d'Âme",
+        astro_intro: "L'astrologie ésotérique (issue d'Alice Bailey) se concentre sur le but de l'âme plutôt que sur l'ego.",
+        tarot_intro: "Le Tarot de Naissance révèle l'archétype de votre âme, le défi karmique que vous portez et la mission secrète inscrite dans vos données de naissance.",
+        soul_card: "Carte de l'Âme", personality_card: "Carte de la Personnalité", year_card: "Carte de l'Année",
+        life_path: "Chemin de Vie & Nombre Maître", tarot_message: "Le Message des Arcanes",
+        synthesis_title: "Votre Portrait Cosmique Complet", synthesis_sub: "La convergence de votre Design Humain, Astrologie Ésotérique et Tarot de Naissance",
+        synth_mission: "Votre Mission", synth_gift: "Votre Don Unique", synth_shadow: "Votre Ombre à Intégrer",
+        synth_mantra: "Votre Mantra Cosmique", synth_alignment: "Votre Alignement Pratique", synth_periods: "Vos Grandes Périodes de Vie",
+        footer: "Usage spirituel et introspectif uniquement"
+    },
+    en: {
+        title: "COSMOGENESIS", subtitle: "Discover your cosmic architecture. The absolute synthesis of Human Design and Esoteric Astrology to reveal your soul's deepest purpose.",
+        form_title: "Enter your birth data", form_sub: "Each detail refines the precision of your cosmic imprint",
+        label_dob: "Date of birth", label_tob: "Time of birth", label_name: "First name", label_city: "Place of birth",
+        btn_reveal: "✦ Reveal my cosmic imprint", btn_export: "↓ Export / Print",
+        loading: "Aligning planetary configurations...",
+        tab_hd: "Human Design", tab_astro: "Esoteric Astrology", tab_bazi: "Four Pillars (BaZi)", tab_jyotish: "Vedic Chart (Jyotish)", tab_tarot: "Birth Tarot", tab_synthesis: "Cosmic Synthesis",
+        bazi_pillars_title: "The Four Pillars", bazi_elements_balance: "Five Elements Balance", bazi_daymaster: "Day Master",
+        bazi_animal: "Animal Sign", bazi_dominant: "Dominant Element", bazi_lacking: "Missing Element", bazi_favorable: "Favorable Element",
+        bazi_section_title: "Your Chinese Energetic Map",
+        bazi_intro: "The Four Pillars of Destiny (BaZi, 八字) are an ancient Chinese system that reads your energetic chart through four pairs of Heavenly Stems and Earthly Branches — those of your year, month, day and hour of birth.",
+        bazi_daymaster_title: "Your Day Master (日主)", bazi_elements_title: "The Balance of the Five Elements (Wu Xing)", bazi_favorable_title: "Your Favorable Element (Yong Shen)",
+        jyotish_chart_title: "Rāśi Chakra (Birth Chart)", jyotish_lagna: "Lagna (Sidereal Ascendant)", jyotish_rashi: "Rāśi (Moon Sign)",
+        jyotish_nakshatra: "Nakshatra", jyotish_dasha: "Current Mahādaśā", jyotish_section_title: "The Sidereal Wheel of the Soul",
+        jyotish_intro: "Jyotish (ज्योतिष), the Vedic astrology of India, uses the sidereal zodiac — adjusted for the ayanamsa — to reveal the karma inscribed in the true position of the stars at the moment of your birth.",
+        jyotish_lagna_title: "The Lagna: Body and Path", jyotish_rashi_title: "The Moon Rāśi: Mind and Emotions",
+        jyotish_nakshatra_title: "The Nakshatra: Your Birth Star", jyotish_dasha_title: "The Mahādaśā: Current Planetary Cycle",
+        bodygraph: "Bodygraph", lbl_type: "Type", lbl_profile: "Profile", lbl_authority: "Authority", lbl_definition: "Definition",
+        lbl_notself: "Not-Self", lbl_signature: "Signature", lbl_cross: "Incarnation Cross",
+        hd_section_title: "Aura Mechanics", your_type: "Your Energy Type",
+        not_self_alert: "Alert: The Not-Self", signature_align: "Alignment: The Signature",
+        incarnation_cross: "Your Incarnation Cross (The Design)", duality: "The Duality: Personality & Design",
+        definition_flow: "The Definition (The Energy Flow)", defined_centers: "Defined Centers (Fixed Forces)",
+        undefined_centers: "Undefined Centers (Learnings)", esoteric_chart: "Esoteric Chart",
+        lbl_sun: "Sun", lbl_moon: "Moon", lbl_asc: "Ascendant", lbl_nodes: "Nodal Axis", lbl_ray: "Predominant Soul Ray",
+        soul_path: "The Soul's Path", karma: "Karma (South Node)", dharma: "Dharma (North Node)",
+        esoteric_ruler: "The Ascendant & Esoteric Ruler", sun_moon_alchemy: "The Sun / Moon Alchemy",
+        soul_ray: "Your Soul Ray",
+        astro_intro: "Esoteric astrology (from Alice Bailey) focuses on the soul's purpose rather than the ego.",
+        tarot_intro: "The Birth Tarot reveals the archetype of your soul, the karmic challenge you carry and the secret mission inscribed in your birth data.",
+        soul_card: "Soul Card", personality_card: "Personality Card", year_card: "Year Card",
+        life_path: "Life Path & Master Number", tarot_message: "The Message of the Arcana",
+        synthesis_title: "Your Complete Cosmic Portrait", synthesis_sub: "The convergence of your Human Design, Esoteric Astrology and Birth Tarot",
+        synth_mission: "Your Mission", synth_gift: "Your Unique Gift", synth_shadow: "Your Shadow to Integrate",
+        synth_mantra: "Your Cosmic Mantra", synth_alignment: "Your Practical Alignment", synth_periods: "Your Major Life Periods",
+        footer: "For spiritual and introspective purposes only"
+    },
+    ru: {
+        title: "КОСМОГЕНЕЗИС", subtitle: "Откройте свою космическую архитектуру. Абсолютный синтез Дизайна Человека и Эзотерической Астрологии для раскрытия глубинной цели вашей души.",
+        form_title: "Введите данные рождения", form_sub: "Каждая деталь уточняет вашу космическую карту",
+        label_dob: "Дата рождения", label_tob: "Время рождения", label_name: "Имя", label_city: "Место рождения",
+        btn_reveal: "✦ Раскрыть мой космический отпечаток", btn_export: "↓ Экспорт / Печать",
+        loading: "Выравнивание планетарных конфигураций...",
+        tab_hd: "Дизайн Человека", tab_astro: "Эзотерическая Астрология", tab_bazi: "Четыре Столпа (Ба-цзы)", tab_jyotish: "Ведическая Карта (Джйотиш)", tab_tarot: "Таро Рождения", tab_synthesis: "Космический Синтез",
+        bazi_pillars_title: "Четыре Столпа", bazi_elements_balance: "Баланс Пяти Элементов", bazi_daymaster: "Хозяин Дня",
+        bazi_animal: "Знак Животного", bazi_dominant: "Доминирующий Элемент", bazi_lacking: "Недостающий Элемент", bazi_favorable: "Благоприятный Элемент",
+        bazi_section_title: "Ваша Китайская Энергетическая Карта",
+        bazi_intro: "Четыре Столпа Судьбы (Ба-цзы, 八字) — древняя китайская система, читающая вашу энергетическую карту через четыре пары Небесных Стволов и Земных Ветвей — года, месяца, дня и часа рождения.",
+        bazi_daymaster_title: "Ваш Хозяин Дня (日主)", bazi_elements_title: "Баланс Пяти Элементов (У-Син)", bazi_favorable_title: "Ваш Благоприятный Элемент (Юн Шэнь)",
+        jyotish_chart_title: "Раши-чакра (Натальная Карта)", jyotish_lagna: "Лагна (Сидерический Асцендент)", jyotish_rashi: "Раши (Лунный Знак)",
+        jyotish_nakshatra: "Накшатра", jyotish_dasha: "Текущая Махадаша", jyotish_section_title: "Сидерическое Колесо Души",
+        jyotish_intro: "Джйотиш (ज्योतिष), ведическая астрология Индии, использует сидерический зодиак — с учётом аянамши — чтобы раскрыть карму, вписанную в истинное положение звёзд в момент вашего рождения.",
+        jyotish_lagna_title: "Лагна: Тело и Путь", jyotish_rashi_title: "Лунная Раши: Разум и Эмоции",
+        jyotish_nakshatra_title: "Накшатра: Звезда Рождения", jyotish_dasha_title: "Махадаша: Текущий Планетарный Цикл",
+        bodygraph: "Бодиграф", lbl_type: "Тип", lbl_profile: "Профиль", lbl_authority: "Авторитет", lbl_definition: "Определённость",
+        lbl_notself: "Не-Я", lbl_signature: "Подпись", lbl_cross: "Крест Воплощения",
+        hd_section_title: "Механика Ауры", your_type: "Ваш Энергетический Тип",
+        not_self_alert: "Предупреждение: Не-Я", signature_align: "Выравнивание: Подпись",
+        incarnation_cross: "Ваш Крест Воплощения (Замысел)", duality: "Двойственность: Личность & Дизайн",
+        definition_flow: "Определённость (Энергетический Поток)", defined_centers: "Определённые Центры (Постоянные Силы)",
+        undefined_centers: "Неопределённые Центры (Уроки)", esoteric_chart: "Эзотерическая Карта",
+        lbl_sun: "Солнце", lbl_moon: "Луна", lbl_asc: "Асцендент", lbl_nodes: "Узловая Ось", lbl_ray: "Преобладающий Луч Души",
+        soul_path: "Путь Души", karma: "Карма (Южный Узел)", dharma: "Дхарма (Северный Узел)",
+        esoteric_ruler: "Асцендент и Эзотерический Правитель", sun_moon_alchemy: "Алхимия Солнца / Луны",
+        soul_ray: "Ваш Луч Души",
+        astro_intro: "Эзотерическая астрология (Алиса Бейли) сосредоточена на цели души, а не эго.",
+        tarot_intro: "Таро Рождения раскрывает архетип вашей души, кармический вызов и тайную миссию, записанную в ваших данных рождения.",
+        soul_card: "Карта Души", personality_card: "Карта Личности", year_card: "Карта Года",
+        life_path: "Жизненный Путь и Мастер-Число", tarot_message: "Послание Арканов",
+        synthesis_title: "Ваш Полный Космический Портрет", synthesis_sub: "Конвергенция вашего Дизайна Человека, Эзотерической Астрологии и Таро Рождения",
+        synth_mission: "Ваша Миссия", synth_gift: "Ваш Уникальный Дар", synth_shadow: "Ваша Тень для Интеграции",
+        synth_mantra: "Ваша Космическая Мантра", synth_alignment: "Ваше Практическое Выравнивание", synth_periods: "Ваши Главные Жизненные Периоды",
+        footer: "Только для духовных и интроспективных целей"
+    }
+};
+
+let currentLang = 'fr';
+
+function setLang(lang) {
+    currentLang = lang;
+    document.querySelectorAll('.lang-btn').forEach(b => {
+        b.classList.remove('active');
+        if (b.getAttribute('onclick') === "setLang('" + lang + "')") b.classList.add('active');
+    });
+
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (TRANSLATIONS[lang][key]) el.textContent = TRANSLATIONS[lang][key];
+    });
+    document.documentElement.lang = lang;
+    document.title = TRANSLATIONS[lang].title + " | Human Design & Astrologie Ésotérique";
+}
+
+// =============================================
+// STARS BACKGROUND
+// =============================================
+(function() {
+    const container = document.getElementById('stars-bg');
+    for (let i = 0; i < 120; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        const size = Math.random() * 2.5 + 0.5;
+        star.style.cssText = `
+            width:${size}px; height:${size}px;
+            left:${Math.random()*100}%; top:${Math.random()*100}%;
+            --dur:${(Math.random()*4+2).toFixed(1)}s;
+            --op:${(Math.random()*0.6+0.1).toFixed(2)};
+            animation-delay: ${(Math.random()*4).toFixed(1)}s;
+        `;
+        container.appendChild(star);
+    }
+})();
+
+// =============================================
+// DATABASES
+// =============================================
+const ZODIAC = [
+    { sign:"Bélier", symbol:"♈", exo:"Mars", eso:"Mercure", ray:"Rayon 1 & 7", cross:"Cardinale" },
+    { sign:"Taureau", symbol:"♉", exo:"Vénus", eso:"Vulcain", ray:"Rayon 4", cross:"Fixe" },
+    { sign:"Gémeaux", symbol:"♊", exo:"Mercure", eso:"Vénus", ray:"Rayon 2", cross:"Mutable" },
+    { sign:"Cancer", symbol:"♋", exo:"Lune", eso:"Neptune", ray:"Rayon 3 & 7", cross:"Cardinale" },
+    { sign:"Lion", symbol:"♌", exo:"Soleil", eso:"Soleil", ray:"Rayon 1 & 5", cross:"Fixe" },
+    { sign:"Vierge", symbol:"♍", exo:"Mercure", eso:"Lune", ray:"Rayon 2 & 6", cross:"Mutable" },
+    { sign:"Balance", symbol:"♎", exo:"Vénus", eso:"Uranus", ray:"Rayon 3", cross:"Cardinale" },
+    { sign:"Scorpion", symbol:"♏", exo:"Pluton", eso:"Mars", ray:"Rayon 4", cross:"Fixe" },
+    { sign:"Sagittaire", symbol:"♐", exo:"Jupiter", eso:"Terre", ray:"Rayon 4, 5 & 6", cross:"Mutable" },
+    { sign:"Capricorne", symbol:"♑", exo:"Saturne", eso:"Saturne", ray:"Rayon 1, 3 & 7", cross:"Cardinale" },
+    { sign:"Verseau", symbol:"♒", exo:"Uranus", eso:"Jupiter", ray:"Rayon 5", cross:"Fixe" },
+    { sign:"Poissons", symbol:"♓", exo:"Neptune", eso:"Pluton", ray:"Rayon 2 & 6", cross:"Mutable" }
+];
+
+const HD_TYPES = [
+    { name:"Générateur", aura:"Ouverte et enveloppante", pct:"~37% de l'humanité",
+      desc:`<strong>Le Bâtisseur Sacré.</strong> Vous êtes la force vitale du monde. Votre Centre Sacral défini est un véritable réacteur nucléaire d'énergie biologique — inépuisable lorsqu'il est engagé dans ce qui vous passionne, et complètement fermé lorsqu'il est forcé dans ce qui ne vous appartient pas.<br><br>
+      Votre aura est <em>ouverte et enveloppante</em> : elle attire les gens à vous et les invite à entrer dans votre champ énergétique. Vous êtes fait(e) pour construire, créer et soutenir — mais uniquement à travers la réponse, jamais par initiation mentale.<br><br>
+      <strong>Le secret des Générateurs :</strong> Votre intelligence ne loge pas dans la tête mais dans le ventre. Ce son sacral — ce "uuh-huh" ou "unh-unh" — qui monte spontanément de votre corps EST votre oracle. Il sait avant votre mental.`,
+      strategy:"Attendre pour répondre", authority:"Sacrale ou Émotionnelle", notSelf:"Frustration", signature:"Satisfaction",
+      notSelfDesc:"Surgit dès que le mental prend le contrôle et initie à la place du Corps. L'énergie se bloque dans un mur invisible. Vous travaillez dur mais sans satisfaction — signe infaillible que vous avez trahi votre réponse sacrale.",
+      sigDesc:"Cet état de plénitude profonde qui arrive après avoir utilisé pleinement et joyeusement toute votre énergie du jour. Une fatigue heureuse, saine, complète. Vous vous endormez satisfait(e) d'avoir été entièrement vous-même.",
+      pratique:"Entraînez-vous à ressentir votre réponse corporelle. Posez-vous des questions fermées (oui/non) et observez votre ventre. Évitez de décider par la tête. Attendez que la vie vous présente quelque chose qui fait vibrer votre Sacral." },
+
+    { name:"Générateur Manifesteur", aura:"Ouverte et enveloppante", pct:"~33% de l'humanité",
+      desc:`<strong>L'Avatar de l'Efficacité Cosmique.</strong> Vous êtes le type le plus dynamique et le plus complexe du Design Humain. Hybride entre le Générateur et le Manifesteur, vous possédez à la fois un Centre Sacral défini ET au moins un canal reliant le Sacral à la Gorge — ce qui vous confère une capacité rare : <em>répondre et agir</em> dans un même mouvement fulgurant.<br><br>
+      Vous n'avez pas besoin d'attendre que les choses se développent lentement. Vous pouvez voir le chemin le plus court et le prendre. Votre génie réside dans cette capacité à sauter les étapes intermédiaires inutiles — sans pour autant négliger ceux qui vous entourent.<br><br>
+      <strong>Votre piège majeur :</strong> Agir si vite que vous oubliez d'informer les autres, qui se sentent alors bousculés, dépassés ou manipulés. L'information préalable n'est pas une politesse — c'est le mécanisme qui élimine la résistance sur votre chemin.`,
+      strategy:"Répondre puis informer", authority:"Sacrale ou Émotionnelle", notSelf:"Frustration & Colère", signature:"Satisfaction & Paix",
+      notSelfDesc:"La frustration surgit quand vous ne suivez pas votre réponse sacrale. La colère explose quand vous agissez trop vite sans informer et que les autres résistent à votre mouvement. Ces deux états ensemble signalent un désalignement profond.",
+      sigDesc:"La satisfaction d'avoir agi vite et juste, alliée à la paix d'un chemin ouvert sans résistance. Quand vous avez répondu correctement ET informé les autres, vous avancez comme un couteau dans du beurre — et c'est exquis.",
+      pratique:"Avant chaque grande action, posez-vous : 'Ai-je répondu à quelque chose de concret ou j'initie depuis ma tête ?' Puis informez les personnes clés de votre entourage de ce que vous allez faire — pas pour demander permission, mais pour qu'ils se préparent." },
+
+    { name:"Projecteur", aura:"Focalisée et pénétrante", pct:"~20% de l'humanité",
+      desc:`<strong>Le Phare, l'Architecte Énergétique et le Guide des Systèmes.</strong> Vous êtes la nouvelle conscience émergente de l'humanité. Sans Centre Sacral défini, vous n'êtes pas fait(e) pour travailler comme les autres — vous êtes fait(e) pour <em>voir</em>, <em>guider</em> et <em>optimiser</em> le travail des autres.<br><br>
+      Votre aura est <em>focalisée et pénétrante</em> : elle s'enfonce dans le Centre G (identité) de l'autre et le lit en profondeur. C'est pourquoi vous connaissez souvent les gens mieux qu'ils ne se connaissent eux-mêmes. Et c'est aussi pourquoi votre présence peut être perçue comme intense, voire intrusive.<br><br>
+      <strong>Le mécanisme de l'Invitation :</strong> Votre sagesse n'est reconnue que lorsqu'elle est demandée. Donner votre avis sans invitation est perçu comme une intrusion, même si vos conseils sont brillants. L'invitation formelle (pour les grandes décisions : travail, amour, lieu de vie) est le sésame qui ouvre la voie à votre succès.`,
+      strategy:"Attendre l'invitation formelle", authority:"Splénique, Émotionnelle ou Auto-projetée", notSelf:"Amertume", signature:"Succès",
+      notSelfDesc:"Cette amertume corrosive qui s'accumule lorsque vous donnez votre meilleure énergie, vos conseils les plus précieux, votre temps et votre sagesse — sans qu'on vous l'ait demandé, sans reconnaissance. Elle ronge de l'intérieur si elle n'est pas identifiée.",
+      sigDesc:"La reconnaissance pure. Ce moment où quelqu'un vous dit 'J'ai besoin de toi, tu vois les choses d'une façon que personne d'autre ne peut voir.' Le succès d'un Projecteur n'est pas la quantité de travail — c'est la qualité de l'impact et la profondeur de la reconnaissance reçue.",
+      pratique:"Maîtrisez l'art de la non-action stratégique. Quand vous voulez partager votre sagesse, attendez qu'on vous invite. En attendant, investissez dans votre connaissance de vous-même et du système que vous étudiez — c'est la valeur que vous accumulerez pour quand l'invitation viendra." },
+
+    { name:"Manifesteur", aura:"Dense et repoussante", pct:"~9% de l'humanité",
+      desc:`<strong>Le Catalyseur Divin, le Pioneer de l'Humanité.</strong> Vous êtes l'un des types les plus rares et les plus mal compris. Vous avez été ici en premier — à une époque où vous étiez rois et reines, chefs et cheffes spirituels, initiateurs de civilisations.<br><br>
+      Votre aura est <em>dense et repoussante</em> — non par défaut, mais par conception. Elle vous protège d'une manière subtile mais puissante : elle garde les autres à une certaine distance pour que votre processus créatif reste pur et sans interférence.<br><br>
+      <strong>Votre génie :</strong> Vous pouvez initier des choses que personne n'a demandé et qui changent le monde. Vous n'avez pas besoin de permission. Mais les autres sentent votre mouvement et réagissent (parfois violemment) s'ils ne sont pas informés. Informer n'est pas négocier — c'est simplement dire "je vais faire X" pour que l'environnement puisse s'adapter.`,
+      strategy:"Informer avant d'agir", authority:"Émotionnelle, Splénique ou de l'Ego", notSelf:"Colère", signature:"Paix",
+      notSelfDesc:"Cette colère sourde et bouillonnante qui surgit chaque fois que quelqu'un tente de vous arrêter, de vous contrôler ou d'interférer avec votre processus. C'est souvent déclenchée par surprise — parce que vous n'avez pas informé, les autres ont réagi par peur.",
+      sigDesc:"Une tranquillité d'âme profonde et spacieuse. Quand un Manifesteur vit dans sa stratégie, il n'y a plus de résistance, plus de lutte. Le monde s'ouvre devant lui comme une mer qui s'écarte. Cette paix intérieure est le signal d'un alignement parfait.",
+      pratique:"Avant chaque action importante, prenez 30 secondes pour informer les personnes concernées. Pas pour demander leur avis — juste : 'Je vais faire X.' Observez comment la résistance disparaît. Protégez jalousement votre temps de solitude créatif — c'est là que votre magie naît." },
+
+    { name:"Réflecteur", aura:"Résistante et échantillonnante", pct:"~1% de l'humanité",
+      desc:`<strong>Le Miroir Cosmique, la Boussole Vivante de la Communauté.</strong> Vous êtes la plus grande rareté du Design Humain — et l'un des êtres les plus précieux et les plus incompris. Sans aucun centre défini, vous êtes un être totalement ouvert, vivant dans un flux constant de transformation.<br><br>
+      Vous êtes profondément lié(e) aux cycles de la Lune. Chaque jour, chaque semaine, vous êtes une personne différente — non par instabilité, mais par conception. Vous êtes fait(e) pour goûter, amplifier et refléter l'énergie de l'environnement et des personnes autour de vous.<br><br>
+      <strong>Votre don extraordinaire :</strong> Vous êtes la thermomètre de l'âme collective. En observant votre état, votre communauté peut savoir si elle est en bonne santé. Si vous souffrez, votre environnement est toxique. Si vous vous épanouissez, vous êtes entouré(e) des bonnes personnes et des bons endroits.`,
+      strategy:"Attendre un cycle lunaire complet (28 jours)", authority:"Autorité Lunaire", notSelf:"Déception", signature:"Surprise",
+      notSelfDesc:"La désillusion profonde et la déception qui arrivent quand vous vous perdez dans les conditionnements des autres, croyant que leur énergie (temporairement amplifiée en vous) est la vôtre. Ou quand vous prenez des décisions importantes sans avoir attendu le cycle lunaire.",
+      sigDesc:"L'émerveillement pur. Cette capacité unique à être constamment surpris(e) par la vie — à la voir toujours fraîche, toujours nouvelle. Les Réflecteurs qui vivent dans leur stratégie deviennent des êtres d'une sagesse et d'une légèreté extraordinaires.",
+      pratique:"Pour toute décision importante, attendez 28 jours. Parlez-en à des gens différents à des moments différents — observez comment votre ressenti change selon les personnes et les moments. Choisissez vos environnements avec une extrême attention : ils vous façonnent profondément." }
+];
+
+const HD_PROFILES = ["1/3","1/4","2/4","2/5","3/5","3/6","4/6","4/1","5/1","5/2","6/2","6/3"];
+
+const HD_CROSSES = [
+    { name:"Croix de l'Angle Droit du Sphinx", desc:"Vous êtes né(e) pour donner une direction claire aux autres. Vous êtes un phare naturel — sans même chercher à diriger, votre simple présence indique le chemin. Les gens se tournent vers vous naturellement dans les moments d'incertitude. Votre mission profonde est d'aider l'humanité à trouver son orientation dans un monde en mutation. Vous portez en vous une boussole cosmique que les autres peuvent sentir intuitivement." },
+    { name:"Croix de l'Angle Droit du Phénix Dormant", desc:"Votre vie est structurée autour de grandes mutations cycliques. Vous amassez des expériences, vous vous installez parfois dans la routine et le confort — puis l'univers vous projette brusquement hors de votre nid pour une renaissance radicale. Ces ruptures ne sont pas des accidents : elles sont votre chemin. Chaque mort symbolique que vous traversez génère une version plus puissante et plus sage de vous-même." },
+    { name:"Croix de l'Angle Gauche de l'Infecteur", desc:"Vous êtes ici pour 'contaminer' positivement le monde avec de nouveaux paradigmes et de nouvelles façons de voir la réalité. Vos idées et vos actions brisent les anciens modèles cristallisés pour forcer l'évolution collective. Votre présence dérange les systèmes établis — et c'est exactement votre rôle. Vous êtes un vecteur de changement radical qui opère souvent sans en avoir l'intention consciente." },
+    { name:"Croix de l'Angle Droit du Vaisseau de l'Amour", desc:"Votre dessein est profondément lié à la connexion et à l'amour inconditionnel. Vous êtes ici pour diriger l'humanité vers davantage d'ouverture, d'acceptation et de connexion cosmique. Votre vie est un enseignement vivant sur la puissance de l'amour véritable — celui qui n'exige rien et qui élève tout ce qu'il touche. Votre plus grand service est d'incarner cet amour dans vos relations et votre communauté." },
+    { name:"Croix de l'Angle Gauche de la Guérison", desc:"Votre but fondamental est la réparation — des corps, des esprits brisés, des systèmes défaillants, des relations fracturées. Vous avez un don inné et presque mystérieux pour percevoir ce qui est malade, cassé, déséquilibré — et pour y apporter le remède juste. Que vous soyez conscient(e) ou non de cette mission, les gens en souffrance se trouvent attirés vers vous comme vers une source de guérison naturelle." },
+    { name:"Croix de la Juxtaposition des Destinées", desc:"Votre chemin de vie est le plus fixe et le plus déterminé de tous les Croisements. Vous êtes le trait d'union cosmique — placé(e) précisément au bon endroit, au bon moment, avec les bonnes personnes, pour que des événements déterminants de l'histoire collective puissent se produire. Vous avez peu de liberté de choix sur votre grande trajectoire, mais une profonde paix lorsque vous acceptez votre rôle de pivot du destin." }
+];
+
+const HD_CENTERS = [
+    { id:"head", name:"Couronne — Centre de l'Inspiration",
+      positive:"Canal direct ouvert avec le plan mental supérieur. Vous recevez des inspirations puissantes et originales que vous pouvez ensuite transmettre sans vous y attacher. Votre pensée est fiable, constante, et vous ne vous sentez pas sous pression de répondre à toutes les questions que vous posez.",
+      negative:"Vous êtes bombardé(e) en permanence d'interrogations, de doutes et d'inspirations qui ne vous appartiennent pas — mais que vous absorbez des autres. Vous vous épuisez à essayer de 'résoudre' les angoisses mentales de votre entourage, croyant que ces questions sont les vôtres." },
+    { id:"ajna", name:"Ajna — Centre de la Conceptualisation",
+      positive:"Votre architecture mentale est fixe et fiable. Vous conceptualisez avec certitude, constance et profondeur. Vos opinions sont stables dans le temps. Vous n'avez pas besoin de l'approbation des autres pour affirmer ce que vous pensez — vous savez que votre perspective est valable.",
+      negative:"Votre esprit est ouvert comme une éponge. Vous absorbez les schémas de pensée des autres et les prenez pour les vôtres. Vous vous épuisez à chercher une certitude mentale immuable — cette certitude que vous observez chez les autres — mais qui n'est pas votre mode de fonctionnement naturel." },
+    { id:"throat", name:"Gorge — Centre de la Manifestation",
+      positive:"Votre voix est une force constante et fiable. Ce que vous dites se transforme systématiquement en actes tangibles. Votre parole a du poids et de la crédibilité. Les gens reconnaissent naturellement votre capacité à transformer les idées en réalité.",
+      negative:"Vous essayez constamment de forcer l'attention en parlant en premier, en parlant fort, ou en vous imposant dans les conversations — pour prouver que vous existez. Vous avez l'impression de ne pas être entendu(e), ce qui vous pousse à parler encore plus. Ce cycle épuise votre énergie." },
+    { id:"g", name:"Centre G — Identité, Direction et Amour",
+      positive:"Vous possédez une boussole intérieure magnétique et inébranlable. Vous savez toujours qui vous êtes, où vous allez, et pourquoi. Vous attirez naturellement les bonnes personnes et les bons endroits dans votre vie. Votre amour de vous-même rayonne vers les autres sans effort.",
+      negative:"Vous cherchez désespérément une identité stable à l'extérieur de vous-même — dans les relations, les titres, les rôles sociaux. Vous prenez la couleur de ceux qui vous entourent (le caméléon). Vous cherchez l'amour à l'extérieur car vous ne le trouvez pas à l'intérieur." },
+    { id:"heart", name:"Cœur/Ego — Centre de la Volonté",
+      positive:"Vous êtes le moteur de la volonté physique et matérielle. Vous faites des promesses que vous tenez. Votre ego sert les autres — vous vous battez pour défendre ceux que vous aimez. Vous avez une capacité rare à tenir vos engagements dans la durée.",
+      negative:"Vous êtes dans un cycle épuisant de preuves constantes. Vous devez prouver votre valeur — à vous-même et aux autres — en faisant plus, en étant plus, en accomplissant plus. Ce moteur de volonté emprunté se vide rapidement et crée des burnout." },
+    { id:"sacral", name:"Sacral — Force Vitale et Sexualité",
+      positive:"Moteur de vie inépuisable. Vous avez une énergie vitale et sexuelle puissante et constante — mais uniquement lorsque vous répondez 'oui' à ce qui vous appelle vraiment. Vous pouvez travailler de longues heures sur ce qui vous passionne sans jamais vous sentir épuisé(e) en profondeur.",
+      negative:"Vous ne savez pas quand vous arrêter. Vous continuez d'emprunter l'énergie des autres, de prendre sur vos réserves, jusqu'au burnout complet. Vous êtes incapable de vous arrêter de vous-même — vous avez besoin d'un signal extérieur pour quitter une situation épuisante." },
+    { id:"root", name:"Racine — Adrénaline et Pression",
+      positive:"Vous êtes équipé(e) pour traiter l'énergie de stress et de pression comme un puissant carburant. La pression vous propulse en avant plutôt que de vous paralyser. Vous êtes excellent(e) pour travailler sous des délais et transformer l'urgence en momentum créatif.",
+      negative:"Vous vivez dans un état de précipitation chronique et d'agitation interne. Vous croyez (inconsciemment) que si vous allez assez vite, si vous faites assez de choses, la pression va s'arrêter. Mais ce moteur fonctionne en circuit fermé — la pression ne s'arrête jamais, elle s'alimente elle-même." },
+    { id:"spleen", name:"Rate — Intuition, Santé et Peur",
+      positive:"Vous avez une intuition splénique qui parle une seule fois, instantanément et toujours dans le présent. C'est le plus ancien système de conscience du corps — lié à la survie et à l'instinct animal. Votre instinct de santé physique et psychique est infaillible quand vous l'écoutez.",
+      negative:"Vous vous accrochez à des personnes, des situations ou des habitudes toxiques — même lorsque vous savez (dans votre corps) qu'elles vous font du mal — par peur du vide, de la solitude ou du changement. La Rate amplifie les peurs des autres et vous pouvez les prendre pour les vôtres." },
+    { id:"solar", name:"Plexus Solaire — Centre Émotionnel",
+      positive:"Vous vivez selon une vague émotionnelle puissante, riche et profonde. Votre clarté spirituelle et vos meilleures décisions arrivent après avoir traversé toute la vague — dans la neutralité émotionnelle. Votre sensibilité est un don exceptionnel : vous pouvez ressentir des nuances que les autres ne perçoivent même pas.",
+      negative:"Vous évitez la confrontation et le conflit émotionnel à tout prix, même au détriment de votre propre vérité. Vous amplifiez les drames émotionnels des autres, absorbez leurs états intérieurs et croyez que ces émotions sont les vôtres. Vous prenez des décisions impulsives dans le haut ou le bas de la vague." }
+];
+
+const RAYONS = [
+    { num:1, name:"Rayon 1 : Volonté et Pouvoir Divin", color:"#ef4444",
+      desc:`<strong>Le Destructeur des Formes Obsolètes et l'Initiateur.</strong><br><br>
+      L'âme sous le Rayon 1 possède le courage indomptable de détruire ce qui entrave l'évolution — structures rigides, vieilles croyances, relations épuisées, systèmes injustes. Ce n'est pas de la violence : c'est de la chirurgie cosmique.<br><br>
+      <strong>Dons naturels :</strong> Leadership né, détermination inébranlable, courage face à l'opposition, vision claire de ce qui doit changer, capacité à prendre des décisions difficiles que les autres fuient.<br><br>
+      <strong>L'épreuve centrale :</strong> Transmuter la domination en Leadership Spirituel pur. La tentation du Rayon 1 est d'utiliser le pouvoir pour lui-même — pour contrôler, imposer, dominer. L'évolution consiste à mettre cette puissance au service des autres, sans ego.<br><br>
+      <strong>Chemin d'évolution :</strong> De la force brute vers la Volonté divine. Du chef qui commande vers le serviteur du Grand Plan cosmique.` },
+    { num:2, name:"Rayon 2 : Amour et Sagesse", color:"#3b82f6",
+      desc:`<strong>Le Bâtisseur Cosmique, le Cœur du Système Solaire.</strong><br><br>
+      C'est le Rayon de notre système solaire lui-même. L'âme sous le Rayon 2 cherche à sauver, instruire et inclure tous les êtres sans discrimination. L'amour ici n'est pas sentimental — c'est une force cosmique d'attraction et de cohésion.<br><br>
+      <strong>Dons naturels :</strong> Enseignement intuitif, compassion profonde, capacité à voir le divin en chaque être, magnétisme naturel qui attire les êtres vers la lumière, patience infinie.<br><br>
+      <strong>L'épreuve centrale :</strong> Surmonter l'attachement excessif pour atteindre la compassion détachée. L'amour du Rayon 2 peut devenir une prison dorée — s'attacher aux disciples, aux résultats, aux êtres aimés — au lieu de les libérer.<br><br>
+      <strong>Chemin d'évolution :</strong> De l'amour possessif vers l'Amour-Sagesse universel. Du sauveur vers le libérateur.` },
+    { num:3, name:"Rayon 3 : Intelligence Active", color:"#10b981",
+      desc:`<strong>L'Architecte Divin, le Tisserand des Plans Cosmiques.</strong><br><br>
+      L'âme sous le Rayon 3 possède une intelligence abstraite et stratégique exceptionnelle. Elle voit les schémas là où les autres ne voient que le chaos. Elle est faite pour comprendre et organiser les vastes systèmes cosmiques, économiques, intellectuels.<br><br>
+      <strong>Dons naturels :</strong> Pensée systémique, vision des grandes structures, adaptabilité mentale extrême, capacité à manier plusieurs idées complexes simultanément, intelligence économique et stratégique.<br><br>
+      <strong>L'épreuve centrale :</strong> Combattre l'orgueil mental et la tendance à sur-compliquer. Le Rayon 3 peut s'enfermer dans des abstractions de plus en plus complexes, perdre le fil de l'action concrète, ou se croire supérieur aux autres par sa complexité.<br><br>
+      <strong>Chemin d'évolution :</strong> De la complication vers la simplicité brillante. De l'intelligence pour l'intelligence vers l'intelligence au service du Bien.` },
+    { num:4, name:"Rayon 4 : Harmonie par le Conflit", color:"#f59e0b",
+      desc:`<strong>Le Pont Lumière/Ombre, l'Artiste de l'Âme.</strong><br><br>
+      L'âme sous le Rayon 4 vit sur le plan du conflit et de la beauté. Elle est ici pour expérimenter les dualités les plus extrêmes — lumière et ténèbres, joie et douleur, ordre et chaos — pour en forger une beauté et une harmonie transcendantes.<br><br>
+      <strong>Dons naturels :</strong> Sensibilité artistique exceptionnelle, don de la médiation et de la réconciliation, capacité à trouver la beauté dans le chaos, intuition des ponts à bâtir entre les opposés, humour profond né de la compréhension des paradoxes.<br><br>
+      <strong>L'épreuve centrale :</strong> Devenir l'axe stable autour duquel la tempête s'apaise, plutôt que d'être emporté(e) par les conflits. Le Rayon 4 peut se noyer dans les drames de sa propre création.<br><br>
+      <strong>Chemin d'évolution :</strong> Du conflit vécu vers l'harmonie révélée. Du témoin souffrant vers l'artiste qui transmute la douleur en beauté.` },
+    { num:5, name:"Rayon 5 : Connaissance Concrète", color:"#8b5cf6",
+      desc:`<strong>Le Révélateur, le Scientifique de l'Esprit.</strong><br><br>
+      L'âme sous le Rayon 5 est ici pour une mission précise et capitale : découvrir l'Esprit caché au cœur de la matière. Révéler que la physique et la métaphysique ne sont que deux langages décrivant la même réalité.<br><br>
+      <strong>Dons naturels :</strong> Rigueur analytique exceptionnelle, capacité à décomposer les systèmes complexes, pragmatisme, efficacité dans l'action, don pour la résolution de problèmes concrets, intelligence appliquée.<br><br>
+      <strong>L'épreuve centrale :</strong> Vaincre la froideur analytique par l'amour et l'intuition. Le Rayon 5 peut devenir une machine froide et distante, incapable de connexion émotionnelle, réduisant tout être à une équation.<br><br>
+      <strong>Chemin d'évolution :</strong> De la connaissance objective vers la sagesse intégrale. Du scientifique vers l'alchimiste qui unit raison et cœur.` },
+    { num:6, name:"Rayon 6 : Idéalisme et Dévotion", color:"#ec4899",
+      desc:`<strong>Le Mystique Enflammé, le Chevalier du Divin.</strong><br><br>
+      L'âme sous le Rayon 6 est propulsée par un dévouement absolu envers un idéal — une cause, une divinité, une vision du monde parfait. Elle brûle d'une flamme intérieure intense qui peut illuminer ou consumer.<br><br>
+      <strong>Dons naturels :</strong> Dévotion totale, loyauté absolue, capacité à inspirer par l'exemple, pureté d'intention, persévérance face aux obstacles, foi indestructible en son idéal.<br><br>
+      <strong>L'épreuve centrale :</strong> Surmonter l'aveuglement fanatique pour un idéalisme ouvert et tolérant. Le Rayon 6, dans son ombre, devient intolérant, dogmatique, incapable d'accepter que d'autres chemins mènent au même sommet.<br><br>
+      <strong>Chemin d'évolution :</strong> Du fanatique ardent vers le mystique sage et universel. De la dévotion exclusive vers l'amour inclusif de toutes les voies.` },
+    { num:7, name:"Rayon 7 : Ordre Cérémoniel et Magie", color:"#06b6d4",
+      desc:`<strong>Le Hiérophante, le Mage Blanc de la Nouvelle Ère.</strong><br><br>
+      L'âme sous le Rayon 7 a pour mission sacrée d'ancrer les énergies spirituelles dans le monde physique — faire descendre le Ciel sur Terre. Elle est l'organisatrice des rituels, des cérémonies et des structures qui permettent à l'Esprit de se manifester dans la matière.<br><br>
+      <strong>Dons naturels :</strong> Sens aigu de l'ordre et de la beauté formelle, don pour le rituel et la cérémonie, capacité à créer des structures qui durent, magie blanche (le pouvoir d'organiser les forces cosmiques au service du bien), élégance naturelle.<br><br>
+      <strong>L'épreuve centrale :</strong> Éviter la magie noire (utiliser les pouvoirs rituels pour des fins égoïstes) et le formalisme mort (des rituels vidés de leur sens spirituel).<br><br>
+      <strong>Chemin d'évolution :</strong> Du bureaucrate rigide vers le Mage Blanc accompli. Du rituel vide vers la cérémonie qui transfigure la matière en Esprit.` }
+];
+
+const PLANET_ENERGIES = {
+    "Mercure":"<strong>Le Divin Messager.</strong> Construit le pont arc-en-ciel entre le mental et la conscience supérieure. Dissipe les illusions.",
+    "Vulcain":"<strong>Le Divin Forgeron.</strong> Opère dans les profondeurs. Brise les chaînes de l'attachement à la forme et forge la volonté spirituelle.",
+    "Lune":"<strong>Le Divin Forgeron (voilé).</strong> Derrière l'instinct se cache Vulcain, qui forge la volonté au cœur de la matière.",
+    "Vénus":"<strong>L'Intelligence Spirituelle.</strong> Force de l'amour pur. Transmute les conflits de l'esprit en harmonie lumineuse.",
+    "Neptune":"<strong>Le Mystique Universel.</strong> Dissout les frontières de l'ego séparé. Invite à la compassion absolue.",
+    "Soleil":"<strong>Le Cœur Rayonnant.</strong> Pousse à devenir une source de lumière vitale.",
+    "Uranus":"<strong>L'Éveilleur Cosmique.</strong> Énergie électrique. Pulvérise les cristallisations mentales.",
+    "Mars":"<strong>Le Guerrier Spirituel.</strong> Force de propulsion pour triompher de l'épreuve de la matière.",
+    "Terre":"<strong>Le Champ d'Évolution.</strong> Transforme la spiritualité abstraite en service concret.",
+    "Saturne":"<strong>Le Gardien du Seuil.</strong> Offre la structure et la pression karmique nécessaires.",
+    "Jupiter":"<strong>Le Grand Fusionneur.</strong> Abondance d'Amour-Sagesse. Unit cœur et esprit.",
+    "Pluton":"<strong>Le Rénovateur Divin.</strong> Tranche les liens toxiques et force la résurrection."
+};
+
+const NODE_MEANINGS = {
+    "Bélier":{ karma:"<ul class='list-disc pl-4 space-y-1 mt-2'><li>Se suradapter pour plaire.</li><li>Incapacité à prendre des décisions seul.</li><li>Peur panique du conflit.</li></ul>", dharma:"<ul class='list-disc pl-4 space-y-1 mt-2'><li>Agir de manière indépendante.</li><li>Développer le courage d'être soi-même.</li><li>Devenir un pionnier de sa propre vie.</li></ul>" },
+    "Taureau":{ karma:"<ul class='list-disc pl-4 space-y-1 mt-2'><li>Attirance pour les crises et l'intensité toxique.</li><li>Manipulation et soif de contrôle occulte.</li></ul>", dharma:"<ul class='list-disc pl-4 space-y-1 mt-2'><li>Construire une vie simple, stable et paisible.</li><li>S'ancrer dans la nature et les plaisirs simples.</li></ul>" },
+    "Gémeaux":{ karma:"<ul class='list-disc pl-4 space-y-1 mt-2'><li>Dogmatisme absolu.</li><li>Donner des leçons de morale sans écouter.</li></ul>", dharma:"<ul class='list-disc pl-4 space-y-1 mt-2'><li>Poser des questions et écouter véritablement.</li><li>Accepter que la vérité a de multiples facettes.</li></ul>" },
+    "Cancer":{ karma:"<ul class='list-disc pl-4 space-y-1 mt-2'><li>Obsession pour le statut social et l'image publique.</li><li>Froideur émotionnelle et rigidité.</li></ul>", dharma:"<ul class='list-disc pl-4 space-y-1 mt-2'><li>Se reconnecter à ses émotions.</li><li>Créer un foyer et une famille de cœur.</li></ul>" },
+    "Lion":{ karma:"<ul class='list-disc pl-4 space-y-1 mt-2'><li>Se cacher dans le groupe par peur du rejet.</li><li>Détachement émotionnel excessif.</li></ul>", dharma:"<ul class='list-disc pl-4 space-y-1 mt-2'><li>Oser briller au centre de la scène.</li><li>Devenir un leader chaleureux et généreux.</li></ul>" },
+    "Vierge":{ karma:"<ul class='list-disc pl-4 space-y-1 mt-2'><li>Fuite dans l'illusion ou la spiritualité perchée.</li><li>Position de victime cosmique.</li></ul>", dharma:"<ul class='list-disc pl-4 space-y-1 mt-2'><li>Ancrer des routines saines.</li><li>Servir le monde de manière pratique.</li></ul>" },
+    "Balance":{ karma:"<ul class='list-disc pl-4 space-y-1 mt-2'><li>Égoïsme aveugle et impulsivité destructrice.</li><li>Incapacité à voir le point de vue de l'autre.</li></ul>", dharma:"<ul class='list-disc pl-4 space-y-1 mt-2'><li>Apprendre l'art du compromis et de la diplomatie.</li><li>Rechercher l'harmonie et la justice.</li></ul>" },
+    "Scorpion":{ karma:"<ul class='list-disc pl-4 space-y-1 mt-2'><li>Attachement excessif au confort matériel.</li><li>Peur viscérale du changement.</li></ul>", dharma:"<ul class='list-disc pl-4 space-y-1 mt-2'><li>Accepter de tout perdre pour renaître.</li><li>Explorer la psychologie humaine et l'occulte.</li></ul>" },
+    "Sagittaire":{ karma:"<ul class='list-disc pl-4 space-y-1 mt-2'><li>Dispersion mentale et nervosité.</li><li>Incapacité à s'engager dans une voie.</li></ul>", dharma:"<ul class='list-disc pl-4 space-y-1 mt-2'><li>Trouver sa vérité personnelle et s'y engager.</li><li>Passer de l'étudiant perpétuel à l'enseignant.</li></ul>" },
+    "Capricorne":{ karma:"<ul class='list-disc pl-4 space-y-1 mt-2'><li>Dépendance émotionnelle et chantage affectif.</li><li>Se cacher dans le passé par peur du monde.</li></ul>", dharma:"<ul class='list-disc pl-4 space-y-1 mt-2'><li>Prendre ses responsabilités en tant qu'adulte.</li><li>Développer l'auto-discipline.</li></ul>" },
+    "Verseau":{ karma:"<ul class='list-disc pl-4 space-y-1 mt-2'><li>Arrogance du roi et égocentrisme.</li><li>Mélodrames pour attirer l'attention.</li></ul>", dharma:"<ul class='list-disc pl-4 space-y-1 mt-2'><li>Se mettre au service de la collectivité.</li><li>Célébrer l'égalité et la fraternité.</li></ul>" },
+    "Poissons":{ karma:"<ul class='list-disc pl-4 space-y-1 mt-2'><li>Perfectionnisme maladif et anxiété du détail.</li><li>Jugement sévère envers soi-même.</li></ul>", dharma:"<ul class='list-disc pl-4 space-y-1 mt-2'><li>S'abandonner à l'intuition et à la foi.</li><li>Développer une compassion inconditionnelle.</li></ul>" }
+};
+
+// =============================================
+// TAROT DATABASE
+// =============================================
+const MAJOR_ARCANA = [
+    { num:0, name:"Le Mat", symbol:"🌀", desc:"L'innocence divine, le commencement de tous les voyages. L'âme pure qui fait confiance à l'univers et marche vers l'inconnu avec joie." },
+    { num:1, name:"Le Bateleur", symbol:"⚡", desc:"La maîtrise de la volonté créatrice. Vous possédez tous les outils nécessaires. Il s'agit maintenant de les utiliser avec intention et conscience." },
+    { num:2, name:"La Papesse", symbol:"🌙", desc:"La gardienne des mystères cachés. Votre âme est reliée aux connaissances ésotériques profondes. La sagesse vient du silence et de l'intuition." },
+    { num:3, name:"L'Impératrice", symbol:"🌿", desc:"La grande mère cosmique. Votre âme cherche à créer, nourrir et faire fleurir. La beauté, la fertilité et l'abondance sont vos thèmes fondamentaux." },
+    { num:4, name:"L'Empereur", symbol:"♦", desc:"La maîtrise de la structure et de l'autorité. Vous êtes ici pour établir l'ordre, protéger et construire des fondations durables." },
+    { num:5, name:"Le Pape", symbol:"🔑", desc:"Le pont entre le divin et l'humain. Votre mission est de transmettre une sagesse ancestrale et de guider les autres vers leur vérité spirituelle." },
+    { num:6, name:"Les Amoureux", symbol:"♥", desc:"Le choix conscient entre deux voies. Votre âme apprend à faire des choix alignés avec ses valeurs profondes plutôt qu'avec ses peurs." },
+    { num:7, name:"Le Chariot", symbol:"⚔", desc:"La victoire par la maîtrise de soi. Vous avez la force de triompher en harnachant vos énergies contraires et en les dirigeant vers un but." },
+    { num:8, name:"La Force", symbol:"🦁", desc:"La puissance douce qui dompte les instincts primitifs. Votre vrai pouvoir réside dans la compassion, pas dans la domination." },
+    { num:9, name:"L'Ermite", symbol:"🕯", desc:"La sagesse de la solitude et de la quête intérieure. Vous portez votre propre lumière pour éclairer le chemin des autres dans les ténèbres." },
+    { num:10, name:"La Roue de Fortune", symbol:"☸", desc:"L'âme qui comprend les cycles cosmiques. Vous êtes ici pour apprendre que tout tourne, et que vous pouvez rester au centre dans la paix." },
+    { num:11, name:"La Justice", symbol:"⚖", desc:"L'équilibre karmique parfait. Votre âme est ici pour rétablir la vérité, défendre l'équité et incarner l'intégrité absolue." },
+    { num:12, name:"Le Pendu", symbol:"🔃", desc:"La révélation par le sacrifice volontaire. En lâchant prise sur vos certitudes, vous percevez la réalité sous un angle entièrement nouveau." },
+    { num:13, name:"L'Arcane sans Nom", symbol:"🦋", desc:"La grande transformation. Ce qui semble une fin est en réalité une renaissance. Votre âme est maître de la transmutation." },
+    { num:14, name:"La Tempérance", symbol:"∞", desc:"L'alchimie de l'équilibre. Votre âme mélange les opposés pour créer quelque chose de supérieur, œuvrant patiemment à la guérison cosmique." },
+    { num:15, name:"Le Diable", symbol:"🜂", desc:"L'illusion des chaînes. Votre grande leçon est de reconnaître que les liens qui vous retiennent sont souvent de votre propre création." },
+    { num:16, name:"La Maison-Dieu", symbol:"⚡", desc:"L'éveil brutal. L'univers déconstruit vos structures rigides pour vous libérer. Le chaos est la porte de la véritable liberté." },
+    { num:17, name:"L'Étoile", symbol:"✦", desc:"L'espoir pur et la guidance divine. Après les épreuves, vous êtes ici pour porter la lumière et offrir la guérison aux autres." },
+    { num:18, name:"La Lune", symbol:"🌕", desc:"Le voyage dans les profondeurs de l'inconscient. Votre âme doit traverser ses propres illusions et peurs pour atteindre la clarté." },
+    { num:19, name:"Le Soleil", symbol:"☀", desc:"La joie pure et le rayonnement conscient. Votre âme est ici pour briller, partager votre vitalité et illuminer ceux qui vous entourent." },
+    { num:20, name:"Le Jugement", symbol:"🎺", desc:"L'appel à l'éveil. Votre âme répond à une vocation supérieure. Vous êtes ici pour vous réinventer complètement selon votre dessein véritable." },
+    { num:21, name:"Le Monde", symbol:"◎", desc:"L'accomplissement et l'intégration cosmique. Votre âme a parcouru tout le cycle et revient avec une conscience élargie à partager." }
+];
+
+const LIFE_PATH_MEANINGS = {
+    1:"Vous êtes le Pionnier, le Leader né. Votre mission est d'initier, d'innover et d'ouvrir de nouvelles voies pour les autres. Votre défi : dépasser l'ego pour un leadership altruiste.",
+    2:"Vous êtes le Diplomate, le Médiateur cosmique. Votre mission est de créer l'harmonie et d'unir. Votre défi : ne pas vous perdre dans les besoins des autres en oubliant les vôtres.",
+    3:"Vous êtes le Créateur, l'Artiste de l'existence. Votre mission est d'exprimer, d'inspirer et de répandre la joie. Votre défi : canaliser votre énergie dispersée vers une création profonde.",
+    4:"Vous êtes le Bâtisseur, le Pilier de stabilité. Votre mission est de créer des structures durables et solides. Votre défi : accepter les changements inévitables sans résistance.",
+    5:"Vous êtes l'Explorateur, l'Aventurier cosmique. Votre mission est de vivre mille vies et de transmettre la liberté. Votre défi : canaliser votre besoin de liberté sans fuir vos responsabilités.",
+    6:"Vous êtes le Nourricier, le Gardien de l'amour. Votre mission est d'harmoniser, guérir et créer beauté autour de vous. Votre défi : éviter le sacrifice de soi au profit des autres.",
+    7:"Vous êtes le Chercheur, le Sage intérieur. Votre mission est de plonger dans les mystères de l'existence. Votre défi : partager votre sagesse au lieu de vous isoler.",
+    8:"Vous êtes le Manifesteur, le Maître de la puissance. Votre mission est d'utiliser le pouvoir et l'abondance au service du monde. Votre défi : transcender la tentation de la domination.",
+    9:"Vous êtes l'Humaniste, l'Âme de compassion universelle. Votre mission est de servir l'humanité entière. Votre défi : laisser partir les attachements pour servir librement.",
+    11:"NOMBRE MAÎTRE 11 : Vous êtes l'Illuminateur, le Messager de la Lumière. Mission rare et exigeante : inspirer les masses par votre sensibilité exceptionnelle et votre vision spirituelle.",
+    22:"NOMBRE MAÎTRE 22 : Vous êtes le Grand Bâtisseur Cosmique. Votre mission est de matérialiser des rêves immenses pour transformer la civilisation. La plus haute vibration de service.",
+    33:"NOMBRE MAÎTRE 33 : Vous êtes le Maître Enseignant Cosmique. Incarnation de l'amour inconditionnel absolu. Mission : élever la conscience collective par l'enseignement et la guérison."
+};
+
+// =============================================
+// BAZI DATABASE (Quatre Piliers de la Destinée)
+// =============================================
+const BAZI_STEMS = [
+    { name:"Bois Yang", symbol:"甲", element:"Bois", polarity:"Yang", trait:"Le Grand Arbre — droiture, ambition, leadership naturel, croissance verticale vers le ciel." },
+    { name:"Bois Yin",  symbol:"乙", element:"Bois", polarity:"Yin",  trait:"La Liane Souple — adaptabilité, diplomatie, résilience discrète, croissance en s'enroulant autour des obstacles." },
+    { name:"Feu Yang",  symbol:"丙", element:"Feu",  polarity:"Yang", trait:"Le Soleil — rayonnement, générosité, charisme visible, chaleur qui éclaire tout sur son passage." },
+    { name:"Feu Yin",   symbol:"丁", element:"Feu",  polarity:"Yin",  trait:"La Flamme de Bougie — intensité intérieure, intuition, chaleur intime, lumière qui guide dans l'obscurité." },
+    { name:"Terre Yang",symbol:"戊", element:"Terre",polarity:"Yang", trait:"La Montagne — stabilité massive, fiabilité, autorité tranquille, ancrage inébranlable." },
+    { name:"Terre Yin", symbol:"己", element:"Terre",polarity:"Yin",  trait:"Le Champ Fertile — réceptivité, nourriture, patience cultivatrice, fertilité discrète." },
+    { name:"Métal Yang",symbol:"庚", element:"Métal",polarity:"Yang", trait:"L'Épée — tranchant, justice, détermination, capacité à couper net ce qui ne sert plus." },
+    { name:"Métal Yin", symbol:"辛", element:"Métal",polarity:"Yin",  trait:"Le Bijou — raffinement, perfectionnisme, valeur cachée, beauté ciselée avec précision." },
+    { name:"Eau Yang",  symbol:"壬", element:"Eau",  polarity:"Yang", trait:"L'Océan — puissance sans limite, adaptabilité, sagesse profonde, mouvement perpétuel vers l'horizon." },
+    { name:"Eau Yin",   symbol:"癸", element:"Eau",  polarity:"Yin",  trait:"La Rosée — subtilité, intuition, pénétration douce, capacité à infiltrer sans forcer." }
+];
+
+const BAZI_BRANCHES = [
+    { animal:"Rat",      symbol:"子", element:"Eau",   trait:"Vif, ingénieux, opportuniste et sociable." },
+    { animal:"Buffle",   symbol:"丑", element:"Terre", trait:"Patient, tenace, travailleur infatigable." },
+    { animal:"Tigre",    symbol:"寅", element:"Bois",  trait:"Courageux, indépendant, animé d'une énergie pionnière." },
+    { animal:"Lapin",    symbol:"卯", element:"Bois",  trait:"Diplomate, sensible, épris d'harmonie et de beauté." },
+    { animal:"Dragon",   symbol:"辰", element:"Terre", trait:"Charismatique, ambitieux, porteur d'une force presque mythique." },
+    { animal:"Serpent",  symbol:"巳", element:"Feu",   trait:"Intuitif, stratège, mystérieux et profondément intelligent." },
+    { animal:"Cheval",   symbol:"午", element:"Feu",   trait:"Libre, énergique, épris de mouvement et d'indépendance." },
+    { animal:"Chèvre",   symbol:"未", element:"Terre", trait:"Doux, créatif, sensible aux arts et à l'harmonie du groupe." },
+    { animal:"Singe",    symbol:"申", element:"Métal", trait:"Astucieux, curieux, brillant résolveur de problèmes." },
+    { animal:"Coq",      symbol:"酉", element:"Métal", trait:"Précis, fier, organisé et perfectionniste." },
+    { animal:"Chien",    symbol:"戌", element:"Terre", trait:"Loyal, protecteur, animé d'un sens aigu de la justice." },
+    { animal:"Cochon",   symbol:"亥", element:"Eau",   trait:"Généreux, sincère, épicurien et profondément bienveillant." }
+];
+
+const BAZI_ELEMENTS = {
+    "Bois":  { color:"#34d399", keyword:"Croissance & Vision", light:"L'expansion créative, la vision à long terme, la générosité de celui qui plante pour les générations futures.", shadow:"La rigidité de l'ambition dévorante, la colère refoulée, l'incapacité à plier quand il le faudrait." },
+    "Feu":   { color:"#f87171", keyword:"Rayonnement & Passion", light:"La joie communicative, le charisme naturel, la capacité à inspirer et à réchauffer les cœurs autour de soi.", shadow:"L'instabilité émotionnelle, l'impatience destructrice, le besoin compulsif d'être vu et admiré." },
+    "Terre": { color:"#d4a24c", keyword:"Stabilité & Nourriture", light:"La fiabilité, l'ancrage, la capacité à nourrir et soutenir durablement ce qui compte.", shadow:"L'entêtement, l'excès de prudence, la difficulté à lâcher prise et à embrasser le changement." },
+    "Métal": { color:"#cbd5e1", keyword:"Structure & Discernement", light:"La clarté tranchante, la justice, la capacité à couper net ce qui doit l'être pour préserver l'essentiel.", shadow:"La froideur, le perfectionnisme paralysant, la tendance à juger sévèrement soi-même et les autres." },
+    "Eau":   { color:"#60a5fa", keyword:"Sagesse & Fluidité", light:"L'intuition profonde, l'adaptabilité, la sagesse tranquille qui trouve toujours son chemin.", shadow:"La dispersion, la peur cachée, la tendance à fuir ou à se dissoudre dans l'indécision." }
+};
+
+const ELEMENT_CYCLE = ["Bois","Feu","Terre","Métal","Eau"]; // engendrement (sheng)
+function elementProduces(a, b) {
+    const i = ELEMENT_CYCLE.indexOf(a);
+    return ELEMENT_CYCLE[(i + 1) % 5] === b;
+}
+function elementControls(a, b) {
+    const controlMap = { "Bois":"Terre", "Terre":"Eau", "Eau":"Feu", "Feu":"Métal", "Métal":"Bois" };
+    return controlMap[a] === b;
+}
+
+// =============================================
+// JYOTISH DATABASE (Thème Natal Védique)
+// =============================================
+const VEDIC_RASHIS = [
+    { name:"Mesha (Bélier)",    lord:"Mars",    trait:"L'initiateur impulsif, guerrier-né, avide de conquêtes nouvelles." },
+    { name:"Vrishabha (Taureau)", lord:"Vénus",  trait:"Le bâtisseur sensoriel, attaché à la beauté, à la stabilité et au plaisir tangible." },
+    { name:"Mithuna (Gémeaux)", lord:"Mercure",  trait:"Le communicant curieux, esprit vif, jonglant avec les idées et les mots." },
+    { name:"Karka (Cancer)",    lord:"Lune",     trait:"Le gardien nourricier, profondément attaché à la famille, à la mémoire et au foyer intérieur." },
+    { name:"Simha (Lion)",      lord:"Soleil",   trait:"Le souverain rayonnant, fier, généreux, né pour occuper le centre de la scène." },
+    { name:"Kanya (Vierge)",    lord:"Mercure",  trait:"L'analyste dévoué, méticuleux, au service de la perfection par le détail." },
+    { name:"Tula (Balance)",    lord:"Vénus",    trait:"Le diplomate esthète, en quête perpétuelle d'équilibre, de justice et d'harmonie relationnelle." },
+    { name:"Vrishchika (Scorpion)", lord:"Mars", trait:"Le transformateur intense, plongeant dans les profondeurs pour renaître transfiguré." },
+    { name:"Dhanu (Sagittaire)",lord:"Jupiter",  trait:"Le chercheur de vérité, philosophe et voyageur, en quête perpétuelle de sens supérieur." },
+    { name:"Makara (Capricorne)",lord:"Saturne", trait:"Le bâtisseur discipliné, patient, gravissant lentement la montagne de son destin." },
+    { name:"Kumbha (Verseau)",  lord:"Saturne",  trait:"Le visionnaire détaché, humaniste, tourné vers le collectif et l'innovation." },
+    { name:"Meena (Poissons)",  lord:"Jupiter",  trait:"Le mystique compassionnel, poreux au monde invisible, en quête de fusion et de transcendance." }
+];
+
+const NAKSHATRAS = [
+    { name:"Ashwini", lord:"Ketu", deity:"Les Ashvins", trait:"L'énergie du guérisseur rapide — initiative fulgurante et instinct de premiers secours." },
+    { name:"Bharani", lord:"Vénus", deity:"Yama", trait:"La force de la transformation radicale — porte les épreuves qui font naître le neuf." },
+    { name:"Krittika", lord:"Soleil", deity:"Agni", trait:"Le feu purificateur — tranchant, discernement, capacité à brûler l'illusion." },
+    { name:"Rohini", lord:"Lune", deity:"Brahma", trait:"La beauté fertile — sensualité, croissance, magnétisme créatif." },
+    { name:"Mrigashira", lord:"Mars", deity:"Soma", trait:"La quête inlassable — curiosité, recherche perpétuelle de la vérité douce." },
+    { name:"Ardra", lord:"Rahu", deity:"Rudra", trait:"La tempête révélatrice — destruction nécessaire à la renaissance émotionnelle." },
+    { name:"Punarvasu", lord:"Jupiter", deity:"Aditi", trait:"Le retour de la lumière — résilience, renouveau après l'épreuve." },
+    { name:"Pushya", lord:"Saturne", deity:"Brihaspati", trait:"La nourriture spirituelle — protection, dévotion, sollicitude profonde." },
+    { name:"Ashlesha", lord:"Mercure", deity:"Nagas", trait:"L'emprise hypnotique — intuition serpentine, pouvoir de persuasion subtil." },
+    { name:"Magha", lord:"Ketu", deity:"Pitrs", trait:"L'héritage ancestral — autorité, fierté, lien profond avec la lignée." },
+    { name:"Purva Phalguni", lord:"Vénus", deity:"Bhaga", trait:"Le plaisir créatif — joie, romance, art de vivre généreux." },
+    { name:"Uttara Phalguni", lord:"Soleil", deity:"Aryaman", trait:"L'alliance loyale — engagement, service et générosité structurée." },
+    { name:"Hasta", lord:"Lune", deity:"Savitar", trait:"La main habile — dextérité, ingéniosité, capacité à manifester par le geste." },
+    { name:"Chitra", lord:"Mars", deity:"Vishvakarma", trait:"L'architecte éclatant — sens esthétique, désir de créer quelque chose de brillant." },
+    { name:"Swati", lord:"Rahu", deity:"Vayu", trait:"L'indépendance mobile — liberté, souplesse, esprit qui ne se laisse pas enfermer." },
+    { name:"Vishakha", lord:"Jupiter", deity:"Indra-Agni", trait:"La détermination ambitieuse — ambition ciblée, capacité à atteindre le but coûte que coûte." },
+    { name:"Anuradha", lord:"Saturne", deity:"Mitra", trait:"La dévotion fidèle — amitié profonde, discipline mise au service de l'amour." },
+    { name:"Jyeshtha", lord:"Mercure", deity:"Indra", trait:"L'aînesse protectrice — responsabilité, pouvoir assumé, sens du devoir envers les autres." },
+    { name:"Mula", lord:"Ketu", deity:"Nirriti", trait:"L'arrachement aux racines — quête radicale de vérité, destruction des illusions profondes." },
+    { name:"Purva Ashadha", lord:"Vénus", deity:"Apas", trait:"L'invincibilité des eaux — force de conviction, énergie purificatrice." },
+    { name:"Uttara Ashadha", lord:"Soleil", deity:"Vishvedevas", trait:"La victoire durable — persévérance, accomplissement qui traverse le temps." },
+    { name:"Shravana", lord:"Lune", deity:"Vishnu", trait:"L'écoute sacrée — sagesse transmise, apprentissage par le son et le récit." },
+    { name:"Dhanishta", lord:"Mars", deity:"Vasus", trait:"La prospérité rythmique — richesse, musique, reconnaissance sociale." },
+    { name:"Shatabhisha", lord:"Rahu", deity:"Varuna", trait:"Le guérisseur solitaire — mystère, médecine, retrait pour mieux soigner." },
+    { name:"Purva Bhadrapada", lord:"Jupiter", deity:"Aja Ekapada", trait:"Le feu ascétique — intensité spirituelle, capacité à transmuter la souffrance." },
+    { name:"Uttara Bhadrapada", lord:"Saturne", deity:"Ahir Budhnya", trait:"La profondeur silencieuse — sagesse mûrie, sérénité née de l'introspection." },
+    { name:"Revati", lord:"Mercure", deity:"Pushan", trait:"Le passage protecteur — compassion, guidage doux vers la fin d'un cycle." }
+];
+
+const DASHA_YEARS = { "Ketu":7, "Vénus":20, "Soleil":6, "Lune":10, "Mars":7, "Rahu":18, "Jupiter":16, "Saturne":19, "Mercure":17 };
+const DASHA_ORDER = ["Ketu","Vénus","Soleil","Lune","Mars","Rahu","Jupiter","Saturne","Mercure"];
+const GRAHA_LIST = [
+    { key:"Soleil", symbol:"☉" }, { key:"Lune", symbol:"☽" }, { key:"Mars", symbol:"♂" },
+    { key:"Mercure", symbol:"☿" }, { key:"Jupiter", symbol:"♃" }, { key:"Vénus", symbol:"♀" },
+    { key:"Saturne", symbol:"♄" }, { key:"Rahu", symbol:"☊" }, { key:"Ketu", symbol:"☋" }
+];
+
+// =============================================
+// PSEUDO-RANDOM ENGINE
+// =============================================
+function hashString(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        hash = ((hash << 5) - hash) + str.charCodeAt(i);
+        hash = hash & hash;
+    }
+    return Math.abs(hash);
+}
+
+class DeterministicRandom {
+    constructor(seed) { this.seed = seed; }
+    next() { const x = Math.sin(this.seed++) * 10000; return x - Math.floor(x); }
+    nextInt(min, max) { return Math.floor(this.next() * (max - min + 1)) + min; }
+    pick(arr) { return arr[this.nextInt(0, arr.length - 1)]; }
+}
+
+// =============================================
+// TAROT NUMEROLOGY
+// =============================================
+function reduceToArcane(n) {
+    while (n > 21 && n !== 22 && n !== 33) {
+        const digits = String(n).split('').map(Number);
+        n = digits.reduce((a, b) => a + b, 0);
+    }
+    return n;
+}
+
+function computeLifePath(dob) {
+    const digits = dob.replace(/-/g, '').split('').map(Number);
+    let sum = digits.reduce((a, b) => a + b, 0);
+    // Check master numbers
+    while (sum > 9 && sum !== 11 && sum !== 22 && sum !== 33) {
+        sum = String(sum).split('').map(Number).reduce((a, b) => a + b, 0);
+    }
+    return sum;
+}
+
+function computeSoulCard(dob) {
+    const parts = dob.split('-');
+    const day = parseInt(parts[2]);
+    const month = parseInt(parts[1]);
+    const yearDigits = parts[0].split('').map(Number).reduce((a, b) => a + b, 0);
+    const sum = day + month + yearDigits;
+    return reduceToArcane(sum);
+}
+
+function computePersonalityCard(dob) {
+    const parts = dob.split('-');
+    const day = parseInt(parts[2]);
+    const month = parseInt(parts[1]);
+    const sum = day + month;
+    return reduceToArcane(sum);
+}
+
+function computeYearCard(dob) {
+    const parts = dob.split('-');
+    const day = parseInt(parts[2]);
+    const month = parseInt(parts[1]);
+    const currentYear = new Date().getFullYear();
+    const yearDigits = String(currentYear).split('').map(Number).reduce((a, b) => a + b, 0);
+    const sum = day + month + yearDigits;
+    return reduceToArcane(sum);
+}
+
+// =============================================
+// BAZI COMPUTATION (Quatre Piliers de la Destinée)
+// =============================================
+function computeBaziPillars(dob, tob) {
+    const [y, m, d] = dob.split('-').map(Number);
+    const [hh, mm] = (tob || "12:00").split(':').map(Number);
+
+    // Year Pillar (sexagenary cycle, reference: stem/branch cycle anchored to year 4 CE)
+    const yearStemIdx = ((y - 4) % 10 + 10) % 10;
+    const yearBranchIdx = ((y - 4) % 12 + 12) % 12;
+
+    // Day Pillar (real sexagenary day count, anchored to 1900-01-31 = Jiazi day, stem0/branch0)
+    const refDate = Date.UTC(1900, 0, 31);
+    const thisDate = Date.UTC(y, m - 1, d);
+    const diffDays = Math.round((thisDate - refDate) / 86400000);
+    const dayCycle = ((diffDays % 60) + 60) % 60;
+    const dayStemIdx = dayCycle % 10;
+    const dayBranchIdx = dayCycle % 12;
+
+    // Month Pillar (approximate: branch follows the solar month, stem follows the "Five Tigers" rule from the year stem)
+    const monthBranchIdx = ((m + 1) % 12 + 12) % 12; // approx.: Jan≈Chou..Feb≈Yin (indicative, not solar-term precise)
+    const monthStemStart = (yearStemIdx % 5) * 2 + 2;
+    const monthStemIdx = (monthStemStart + ((monthBranchIdx - 2 + 12) % 12)) % 10;
+
+    // Hour Pillar (real "Five Rats" rule from the day stem)
+    const hourBranchIdx = Math.floor(((hh + 1) % 24) / 2) % 12;
+    const hourStemStart = (dayStemIdx % 5) * 2;
+    const hourStemIdx = (hourStemStart + hourBranchIdx) % 10;
+
+    const mk = (stemIdx, branchIdx) => ({ stem: BAZI_STEMS[stemIdx], branch: BAZI_BRANCHES[branchIdx] });
+
+    return {
+        year: mk(yearStemIdx, yearBranchIdx),
+        month: mk(monthStemIdx, monthBranchIdx),
+        day: mk(dayStemIdx, dayBranchIdx),
+        hour: mk(hourStemIdx, hourBranchIdx)
+    };
+}
+
+function computeElementBalance(pillars) {
+    const counts = { "Bois":0, "Feu":0, "Terre":0, "Métal":0, "Eau":0 };
+    ["year","month","day","hour"].forEach(p => {
+        counts[pillars[p].stem.element]++;
+        counts[pillars[p].branch.element]++;
+    });
+    return counts;
+}
+
+// =============================================
+// JYOTISH COMPUTATION (Thème Natal Védique — pseudo-sidéral)
+// =============================================
+function computeJyotishData(seedString) {
+    const rng = new DeterministicRandom(hashString(seedString + '-jyotish'));
+
+    const moonDeg = rng.next() * 360;
+    const lagnaDeg = rng.next() * 360;
+    const sunDeg = rng.next() * 360;
+
+    const rashiIndex = deg => Math.floor(((deg % 360) + 360) % 360 / 30);
+    const nakshatraSpan = 360 / 27;
+    const nakIndex = deg => Math.floor(((deg % 360) + 360) % 360 / nakshatraSpan);
+    const padaOf = deg => Math.floor((((deg % 360) + 360) % 360 % nakshatraSpan) / (nakshatraSpan / 4)) + 1;
+
+    const lagnaRashi = rashiIndex(lagnaDeg);
+    const moonRashi = rashiIndex(moonDeg);
+    const moonNakIdx = nakIndex(moonDeg);
+    const moonPada = padaOf(moonDeg);
+
+    // Place the 9 grahas around the sidereal wheel, each in a rashi (independent deterministic draw)
+    const grahaPlacements = GRAHA_LIST.map((g, i) => {
+        let deg;
+        if (g.key === "Soleil") deg = sunDeg;
+        else if (g.key === "Lune") deg = moonDeg;
+        else deg = new DeterministicRandom(hashString(seedString + '-jyotish-' + g.key)).next() * 360;
+        const rashi = rashiIndex(deg);
+        const house = ((rashi - lagnaRashi + 12) % 12) + 1;
+        return { ...g, rashi, house };
+    });
+
+    // Vimshottari Mahadasha: sequence starts at the Moon's Nakshatra lord, with a random elapsed fraction of the first period at birth
+    const startLordIdx = DASHA_ORDER.indexOf(NAKSHATRAS[moonNakIdx].lord);
+    const birthFraction = rng.next(); // fraction of the starting dasha already elapsed at birth
+    const sequence = [];
+    for (let i = 0; i < 9; i++) sequence.push(DASHA_ORDER[(startLordIdx + i) % 9]);
+
+    return {
+        lagnaRashi: VEDIC_RASHIS[lagnaRashi],
+        moonRashi: VEDIC_RASHIS[moonRashi],
+        nakshatra: NAKSHATRAS[moonNakIdx],
+        moonPada,
+        grahaPlacements,
+        dashaSequence: sequence,
+        birthFraction
+    };
+}
+
+function computeCurrentDasha(jyotish, birthDob) {
+    const birthYear = new Date(birthDob + 'T12:00:00').getFullYear();
+    const age = new Date().getFullYear() - birthYear;
+    let elapsed = -DASHA_YEARS[jyotish.dashaSequence[0]] * jyotish.birthFraction; // negative = years already spent before birth in this dasha
+    for (let i = 0; i < jyotish.dashaSequence.length; i++) {
+        const lord = jyotish.dashaSequence[i];
+        const dur = DASHA_YEARS[lord];
+        if (age < elapsed + dur || i === jyotish.dashaSequence.length - 1) {
+            const startAge = Math.max(0, Math.round(elapsed));
+            const endAge = Math.round(elapsed + dur);
+            return { lord, startAge, endAge, startYear: birthYear + startAge, endYear: birthYear + endAge };
+        }
+        elapsed += dur;
+    }
+    return { lord: jyotish.dashaSequence[0], startAge:0, endAge:DASHA_YEARS[jyotish.dashaSequence[0]], startYear:birthYear, endYear:birthYear+DASHA_YEARS[jyotish.dashaSequence[0]] };
+}
+
+// =============================================
+// DATA GENERATION
+// =============================================
+function generateCosmicData(dob, tob, city) {
+    const seedString = `${dob}-${tob}-${city.toLowerCase().trim()}`;
+    const rng = new DeterministicRandom(hashString(seedString));
+
+    const ascendant = rng.pick(ZODIAC);
+    const sun = rng.pick(ZODIAC);
+    const moon = rng.pick(ZODIAC);
+    const soulRay = rng.pick(RAYONS);
+    const nnIndex = rng.nextInt(0, 11);
+    const northNode = ZODIAC[nnIndex];
+    const southNode = ZODIAC[(nnIndex + 6) % 12];
+
+    const typeRoll = rng.nextInt(1, 100);
+    let hdType;
+    if (typeRoll <= 35) hdType = HD_TYPES[0];
+    else if (typeRoll <= 70) hdType = HD_TYPES[1];
+    else if (typeRoll <= 90) hdType = HD_TYPES[2];
+    else if (typeRoll <= 99) hdType = HD_TYPES[3];
+    else hdType = HD_TYPES[4];
+
+    const profile = rng.pick(HD_PROFILES);
+    const cross = rng.pick(HD_CROSSES);
+
+    const centers = HD_CENTERS.map(c => ({
+        ...c, defined: hdType.name === "Réflecteur" ? false : rng.nextInt(0, 1) === 1
+    }));
+    if (hdType.name === "Générateur" || hdType.name === "Générateur Manifesteur") centers.find(c => c.id === "sacral").defined = true;
+    if (hdType.name === "Projecteur" || hdType.name === "Manifesteur") centers.find(c => c.id === "sacral").defined = false;
+    if (hdType.name === "Manifesteur") centers.find(c => c.id === "throat").defined = true;
+
+    // Tarot
+    const soulCardNum = computeSoulCard(dob);
+    const persCardNum = computePersonalityCard(dob);
+    const yearCardNum = computeYearCard(dob);
+    const lifePathNum = computeLifePath(dob);
+
+    const soulCard = MAJOR_ARCANA[soulCardNum % 22];
+    const persCard = MAJOR_ARCANA[persCardNum % 22];
+    const yearCard = MAJOR_ARCANA[yearCardNum % 22];
+
+    // BaZi
+    const baziPillars = computeBaziPillars(dob, tob);
+    const baziElements = computeElementBalance(baziPillars);
+
+    // Jyotish
+    const jyotish = computeJyotishData(seedString);
+
+    return {
+        astro: { ascendant, sun, moon, soulRay, northNode, southNode },
+        hd: { type: hdType, profile, centers, cross },
+        tarot: { soulCard, persCard, yearCard, lifePathNum },
+        bazi: { pillars: baziPillars, elements: baziElements },
+        jyotish,
+        seed: seedString
+    };
+}
+
+// =============================================
+// TABS
+// =============================================
+const allTabs = ['hd', 'astro', 'bazi', 'jyotish', 'tarot', 'synthesis'];
+
+function switchTab(id) {
+    allTabs.forEach(t => {
+        document.getElementById('content-' + t).classList.add('hidden');
+        const btn = document.getElementById('tab-' + t);
+        btn.classList.remove('tab-active', 'text-yellow-200');
+        btn.classList.add('text-slate-500');
+    });
+    document.getElementById('content-' + id).classList.remove('hidden');
+    const active = document.getElementById('tab-' + id);
+    active.classList.add('tab-active', 'text-yellow-200');
+    active.classList.remove('text-slate-500');
+}
+
+document.getElementById('tab-hd').addEventListener('click', () => switchTab('hd'));
+document.getElementById('tab-astro').addEventListener('click', () => switchTab('astro'));
+document.getElementById('tab-bazi').addEventListener('click', () => switchTab('bazi'));
+document.getElementById('tab-jyotish').addEventListener('click', () => switchTab('jyotish'));
+document.getElementById('tab-tarot').addEventListener('click', () => switchTab('tarot'));
+document.getElementById('tab-synthesis').addEventListener('click', () => switchTab('synthesis'));
+
+// =============================================
+// FORM SUBMIT
+// =============================================
+document.getElementById('birth-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const dob = document.getElementById('dob').value;
+    const tob = document.getElementById('tob').value;
+    const city = document.getElementById('city').value;
+
+    document.getElementById('input-section').classList.add('hidden');
+    const loading = document.getElementById('loading-section');
+    loading.classList.remove('hidden');
+    loading.classList.add('flex');
+
+    setTimeout(() => {
+        loading.classList.remove('flex');
+        loading.classList.add('hidden');
+        const resultsSection = document.getElementById('results-section');
+        resultsSection.classList.remove('hidden');
+        setTimeout(() => {
+            resultsSection.classList.remove('opacity-0');
+            populateData(dob, tob, city);
+        }, 50);
+    }, 1800);
+});
+
+// =============================================
+// POPULATE DATA
+// =============================================
+function populateData(dob, tob, city) {
+    const data = generateCosmicData(dob, tob, city);
+    const firstName = document.getElementById('firstname').value || '';
+
+    const dateObj = new Date(dob + 'T12:00:00');
+    const dateStr = dateObj.toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' });
+    document.getElementById('res-name').textContent = firstName ? `${firstName} — Profil Cosmique` : 'Votre Profil Cosmique';
+    document.getElementById('res-details').textContent = `Né(e) le ${dateStr} à ${tob} à ${city.toUpperCase()}`;
+
+    // ── HUMAN DESIGN ──
+    const t = data.hd.type;
+    document.getElementById('hd-type').textContent = t.name;
+    document.getElementById('hd-profile').textContent = data.hd.profile;
+    document.getElementById('hd-authority').textContent = t.authority;
+    document.getElementById('hd-cross').textContent = data.hd.cross.name;
+    document.getElementById('hd-notself').textContent = t.notSelf;
+    document.getElementById('hd-signature').textContent = t.signature;
+
+    const defCount = data.hd.centers.filter(c => c.defined).length;
+    let defShort, defName, defDesc;
+    if (defCount === 0) {
+        defShort="Aucune"; defName="Aucune Définition — Le Réflecteur Pur";
+        defDesc=`Vous n'avez aucun centre défini — aucun canal énergétique fixe dans votre graphe. C'est la marque du Réflecteur pur. Votre énergie est un espace vide et sacré, complètement ouvert à l'environnement. Vous amplifiez et reflétez tout ce que vous rencontrez, comme un cristal qui capture et retransmet toutes les couleurs de la lumière. <br><br>Votre identité n'est pas une chose fixe que vous devez trouver — elle est fluide, multifacette et en perpétuel changement selon les personnes et les lieux. Ce n'est pas une faiblesse : c'est votre superpouvoir. Vous êtes le baromètre de la santé de votre communauté.`;
+    } else if (defCount <= 3) {
+        defShort="Simple"; defName="Définition Simple — Flux Unifié";
+        defDesc=`Tous vos centres définis forment un territoire énergétique unique et parfaitement connecté en interne. Votre énergie circule de manière fluide et cohérente à l'intérieur de vous, sans interruption. <br><br>Vous êtes une unité complète et autonome. Vous n'avez pas besoin d'une autre personne pour 'compléter' votre circuit — vous fonctionnez bien seul(e). Votre processus de décision est rapide et fiable car votre énergie est cohérente. En revanche, vous pouvez parfois paraître difficile à influencer ou à convaincre — ce qui est en réalité une force.`;
+    } else if (defCount <= 5) {
+        defShort="Double"; defName="Double Scission — Le Chercheur de Ponts";
+        defDesc=`Vos centres définis forment deux îlots énergétiques distincts, séparés par un espace non défini. Ces deux territoires ne se connectent pas directement l'un à l'autre — et vous ressentez souvent inconsciemment ce 'manque', cette sensation que quelque chose est incomplet en vous. <br><br>Cette dynamique vous attire vers des partenaires et des amis qui 'font le pont' entre vos deux îlots — qui connectent temporairement ces deux parties de vous-même. Le partenariat, l'amour, l'amitié profonde sont des thèmes fondamentaux et récurrents de votre vie. Votre défi : apprendre à vous sentir complet(e) sans avoir besoin d'un pont permanent.`;
+    } else if (defCount <= 7) {
+        defShort="Triple"; defName="Triple Scission — Le Chercheur d'Environnement";
+        defDesc=`Vos centres définis forment trois groupes distincts, créant trois territoires énergétiques séparés. Pour que votre énergie circule pleinement, vous avez besoin que des 'ponts' temporaires soient créés entre ces trois zones — non par une seule personne (impossible), mais par un environnement dynamique et vivant. <br><br>Les espaces publics, les cafés animés, les marchés, les lieux de rassemblement sont pour vous des environnements énergétisants. Les auras changeantes des inconnus autour de vous créent spontanément les ponts dont vous avez besoin. Seule chez vous, votre énergie peut se sentir fragmentée ou suspendue.`;
+    } else {
+        defShort="Quadruple"; defName="Quadruple Scission — L'Individu Radical";
+        defDesc=`Une configuration extrêmement rare. Vos centres définis forment quatre territoires distincts — et aucune personne seule ne peut faire tous les ponts pour vous. Vous avez besoin de l'environnement le plus divers et le plus vaste pour vous sentir entier(e). <br><br>Votre processus d'intégration est le plus lent de tous — vous avez besoin de beaucoup de temps, de solitude et d'espace avant de prendre des décisions importantes. Ne vous laissez jamais presser. Votre rythme de vie doit être vaste, aéré, riche en diversité de personnes et d'expériences.`;
+    }
+
+    document.getElementById('hd-definition').textContent = defShort;
+    document.getElementById('interp-definition-name').textContent = defName;
+    document.getElementById('interp-definition-desc').innerHTML = defDesc;
+
+    document.getElementById('interp-type').innerHTML = `
+        ${t.desc}
+        <div class="mt-4 grid grid-cols-2 gap-3 text-xs">
+            <div class="bg-slate-700/40 rounded-lg p-3"><span class="block text-slate-400 uppercase tracking-wider mb-1">Aura</span><span class="text-white">${t.aura||'—'}</span></div>
+            <div class="bg-slate-700/40 rounded-lg p-3"><span class="block text-slate-400 uppercase tracking-wider mb-1">Population</span><span class="text-white">${t.pct||'—'}</span></div>
+            <div class="bg-slate-700/40 rounded-lg p-3 col-span-2"><span class="block text-slate-400 uppercase tracking-wider mb-1">Stratégie</span><span class="text-yellow-300 font-medium">${t.strategy}</span></div>
+        </div>
+        ${t.pratique ? `<div class="mt-4 bg-indigo-900/20 border-l-4 border-indigo-400 p-4 rounded-r-xl"><span class="block text-indigo-300 text-xs uppercase tracking-wider mb-2 font-bold">Pratique concrète</span><p class="text-slate-300 text-sm">${t.pratique}</p></div>` : ''}`;
+
+    document.getElementById('interp-notself-desc').innerHTML = `<strong>${t.notSelf} :</strong> ${t.notSelfDesc}`;
+    document.getElementById('interp-signature-desc').innerHTML = `<strong>${t.signature} :</strong> ${t.sigDesc}`;
+    document.getElementById('interp-hd-cross').innerHTML = data.hd.cross.desc;
+
+    const profileParts = data.hd.profile.split('/');
+    const linesData = {
+        "1":{ name:"l'Investigateur", desc:"Votre fondation est la connaissance. Avant d'agir, vous avez un besoin profond et irrépressible d'investiguer, de rechercher, de comprendre en profondeur. Vous êtes l'expert(e) de référence — mais votre ombre est la paralysie par l'analyse : vous pouvez toujours trouver une raison de creuser davantage avant de passer à l'action. La sécurité intérieure vient de la maîtrise."},
+        "2":{ name:"l'Ermite", desc:"Vous portez en vous un génie naturel et spontané que vous n'avez souvent pas conscience de posséder. Vous avez un besoin vital de solitude et de retraite pour vous ressourcer et laisser votre talent s'exprimer. Les autres perçoivent votre don avant vous. Votre défi : accepter d'être 'appelé(e)' par les autres sans vous sentir dérangé(e) — car c'est souvent ainsi que votre destinée se manifeste."},
+        "3":{ name:"le Martyr", desc:"Vous apprenez par l'expérience directe, par les essais, les erreurs et la résilience. Vos 'échecs' ne sont pas des catastrophes : ce sont des données précieuses que vous accumulez pour construire votre sagesse unique. Vous avez une résistance naturelle exceptionnelle. Votre vie peut ressembler à une série de ruptures et de recommencements — et c'est exactement ainsi que vous découvrez ce qui fonctionne vraiment."},
+        "4":{ name:"l'Opportuniste", desc:"Votre réseau intime est votre territoire sacré et votre principal vecteur d'influence. Vous construisez des ponts entre les personnes, créez des alliances, et votre impact se propage par vos relations profondes. Vous avez besoin de fondations solides (famille, amis proches, communauté) pour vous sentir sécurisé(e) avant d'agir. Vos meilleures opportunités arrivent toujours par des gens que vous connaissez déjà."},
+        "5":{ name:"l'Hérétique", desc:"Vous êtes projeté(e) comme le sauveur, la solution, l'expert(e) universel(le) — même (et surtout) avant d'avoir prouvé quoi que ce soit. Les gens attendent beaucoup de vous. Cette projection peut être un cadeau ou un fardeau. Votre force : vous avez effectivement la capacité d'apporter des solutions pratiques là où les autres échouent. Votre ombre : la chute est vertigineuse si vous ne répondez pas aux attentes projetées."},
+        "6":{ name:"le Modèle de Rôle", desc:"Votre vie se déroule en trois phases distinctes. De 0 à ~30 ans : phase d'expérimentation intense (comme la Ligne 3). De ~30 à ~50 ans : phase de retrait sur la colline — vous observez, vous intégrez, vous vous reconstruisez en silence. Après 50 ans : vous descendez de la colline comme le Sage ou la Sage accompli(e), incarnant une sagesse authentique que vous avez réellement vécue et prouvée dans votre propre chair."}
+    };
+    const pl0 = linesData[profileParts[0]]; const pl1 = linesData[profileParts[1]];
+    document.getElementById('interp-duality').innerHTML = `
+        <p class="text-sm text-slate-400 leading-relaxed">Le Design Humain révèle que vous êtes une conscience binaire : un Esprit conscient (Personnalité) et un Corps inconscient (Design). Ces deux forces créent ensemble votre Profil global : <strong class="text-white">${data.hd.profile}</strong> — une combinaison unique de deux archétypes fondamentaux.</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <div class="bg-slate-900/80 border-t-2 border-slate-500 p-5 rounded-b-xl shadow-lg">
+                <span class="flex items-center text-xs uppercase tracking-wider text-slate-300 mb-3 font-bold"><span class="block w-3 h-3 bg-slate-950 border border-slate-500 rounded-full mr-2"></span>La Personnalité — Le Conscient (Noir)</span>
+                <p class="text-[11px] text-slate-400 mb-4 border-b border-slate-700/50 pb-3 leading-relaxed">Calculée au moment exact de votre naissance. C'est votre mental, votre identité consciente, <strong>qui vous pensez être</strong>. C'est le Passager assis à l'arrière du véhicule qui observe le paysage et commente le voyage.</p>
+                <span class="block text-base text-yellow-300 font-bold mb-2">Ligne ${profileParts[0]} : ${pl0?.name}</span>
+                <p class="text-slate-300 text-xs leading-relaxed">${pl0?.desc}</p>
+            </div>
+            <div class="bg-red-950/20 border-t-2 border-red-700 p-5 rounded-b-xl shadow-lg">
+                <span class="flex items-center text-xs uppercase tracking-wider text-red-400 mb-3 font-bold"><span class="block w-3 h-3 bg-red-600 rounded-full mr-2 shadow-[0_0_8px_rgba(220,38,38,0.8)]"></span>Le Design — L'Inconscient (Rouge)</span>
+                <p class="text-[11px] text-red-200/70 mb-4 border-b border-red-900/50 pb-3 leading-relaxed">Calculé exactement 88 degrés de Soleil (~88 jours) avant votre naissance. C'est votre Corps, votre génétique, vos comportements automatiques. <strong>Les autres voient souvent ces traits en vous bien avant que vous ne les reconnaissiez vous-même.</strong></p>
+                <span class="block text-base text-red-300 font-bold mb-2">Ligne ${profileParts[1]} : ${pl1?.name}</span>
+                <p class="text-red-200/80 text-xs leading-relaxed">${pl1?.desc}</p>
+            </div>
+        </div>`;
+
+    const ulDefined = document.getElementById('interp-defined-centers');
+    const ulUndefined = document.getElementById('interp-undefined-centers');
+    ulDefined.innerHTML = ''; ulUndefined.innerHTML = '';
+    data.hd.centers.forEach(c => {
+        const li = document.createElement('li');
+        li.className = "flex flex-col p-4 rounded-xl border";
+        if (c.defined) {
+            li.className += " bg-yellow-950/10 border-yellow-900/30";
+            li.innerHTML = `<span class="text-yellow-400 font-bold mb-2 text-sm flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-yellow-400 inline-block"></span>${c.name}</span><p class="text-slate-300 text-xs leading-relaxed">${c.positive}</p>`;
+            ulDefined.appendChild(li);
+        } else {
+            li.className += " bg-blue-950/10 border-blue-900/30";
+            li.innerHTML = `<span class="text-blue-300 font-bold mb-2 text-sm flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-blue-400 inline-block"></span>${c.name}</span><p class="text-slate-400 text-xs leading-relaxed">${c.negative}</p>`;
+            ulUndefined.appendChild(li);
+        }
+    });
+    if (!ulDefined.children.length) ulDefined.innerHTML = "<li class='italic p-3 bg-slate-800 rounded-xl text-sm text-slate-400'>Aucun centre défini. Vous êtes un pur Réflecteur cosmique — le miroir vivant de votre communauté.</li>";
+    if (!ulUndefined.children.length) ulUndefined.innerHTML = "<li class='italic p-3 bg-slate-800 rounded-xl text-sm text-slate-400'>Tous vos centres sont définis. Stabilité et cohérence intérieure extrêmes.</li>";
+
+    drawBodygraph(data.hd.centers);
+
+    // ── ASTROLOGY ──
+    document.getElementById('ast-sun').textContent = `${data.astro.sun.sign} ${data.astro.sun.symbol}`;
+    document.getElementById('ast-moon').textContent = `${data.astro.moon.sign} ${data.astro.moon.symbol}`;
+    document.getElementById('ast-asc').textContent = `${data.astro.ascendant.sign} ${data.astro.ascendant.symbol}`;
+    document.getElementById('ast-nodes').innerHTML = `<span class="text-slate-400">☋ ${data.astro.southNode.sign}</span> &nbsp;⟶&nbsp; <span>☊ ${data.astro.northNode.sign}</span>`;
+    document.getElementById('ast-ray').textContent = data.astro.soulRay.name;
+
+    const nnData = NODE_MEANINGS[data.astro.northNode.sign];
+    if (nnData) {
+        document.getElementById('interp-node-south').innerHTML = `
+            <p class="text-xs text-slate-400 italic mb-3">Le Nœud Sud représente ce que votre âme a déjà maîtrisé dans ses incarnations passées. C'est votre zone de confort — séduisante mais stagnante si vous y restez trop longtemps.</p>
+            <strong class="text-slate-300 text-xs uppercase tracking-wider">Comportements à dépasser :</strong>${nnData.karma}`;
+        document.getElementById('interp-node-north').innerHTML = `
+            <p class="text-xs text-emerald-200/70 italic mb-3">Le Nœud Nord est votre boussole karmique — la direction vers laquelle votre âme cherche à évoluer dans cette incarnation. C'est inconfortable au début, mais c'est là que réside votre épanouissement.</p>
+            <strong class="text-emerald-300 text-xs uppercase tracking-wider">Qualités à développer :</strong>${nnData.dharma}`;
+    }
+
+    const rulerEnergy = PLANET_ENERGIES[data.astro.ascendant.eso] || "Énergie poussant vers l'évolution.";
+    const crossMeanings = {
+        "Cardinale": { name:"La Croix Cardinale", desc:"Vous êtes sur la Croix des Initiateurs. Les signes cardinaux (Bélier, Cancer, Balance, Capricorne) incarnent le principe de l'action créatrice — le pouvoir de commencer, d'initier, de lancer de nouveaux cycles. Votre âme est ici pour initier des changements, non pour maintenir des structures existantes." },
+        "Fixe": { name:"La Croix Fixe", desc:"Vous êtes sur la Croix des Transmutateurs. Les signes fixes (Taureau, Lion, Scorpion, Verseau) incarnent le principe de la transformation en profondeur. Votre âme est ici pour transmuter — transformer la matière dense en lumière, les désirs de l'ego en amour spirituel." },
+        "Mutable": { name:"La Croix Mutable", desc:"Vous êtes sur la Croix des Distributeurs. Les signes mutables (Gémeaux, Vierge, Sagittaire, Poissons) incarnent le principe de la distribution et de la communication. Votre âme est ici pour transmettre, adapter et faire circuler les connaissances entre les différents plans de conscience." }
+    };
+    const crossInfo = crossMeanings[data.astro.ascendant.cross] || crossMeanings["Mutable"];
+
+    document.getElementById('interp-esoteric-ruler').innerHTML = `
+        <div class="mb-4 p-4 bg-slate-700/30 rounded-xl border border-slate-600/30">
+            <h6 class="text-yellow-400 cinzel text-sm font-bold mb-2">${crossInfo.name}</h6>
+            <p class="text-slate-300 text-sm leading-relaxed">${crossInfo.desc}</p>
+        </div>
+        <p class="text-slate-300 leading-relaxed mb-4">Votre ascendant en <strong class="text-white">${data.astro.ascendant.sign} ${data.astro.ascendant.symbol}</strong> définit votre masque social exotérique — comment vous vous présentez au monde selon la vision traditionnelle. Mais en astrologie ésotérique, l'Ascendant révèle quelque chose de bien plus profond : <em>le but même de votre incarnation</em>, l'axe autour duquel toute votre vie s'organise.</p>
+        <p class="text-slate-300 leading-relaxed mb-4">Alors que le régent <strong>exotérique</strong> (${data.astro.ascendant.exo}) gouverne votre personnalité et votre vie quotidienne, le régent <strong>ésotérique</strong> de votre Ascendant est <strong class="text-yellow-300">${data.astro.ascendant.eso}</strong> — c'est l'aimant spirituel qui tire votre âme hors de l'ego vers son dessein véritable.</p>
+        <div class="border-l-4 border-yellow-500 pl-4 py-3 bg-yellow-900/10 text-slate-200 rounded-r-xl text-sm">
+            <span class="block text-yellow-400 text-xs uppercase tracking-wider mb-2 font-bold">Énergie du Régent Ésotérique — ${data.astro.ascendant.eso}</span>
+            ${rulerEnergy}
+        </div>`;
+
+    const zodiacDepth = {
+        "Bélier":"Le Bélier solaire pousse votre âme à affirmer son identité propre avec courage et spontanéité. Vous êtes ici pour initier, pour commencer, pour être le feu qui allume les autres. L'ombre : l'impulsivité et l'égocentrisme.",
+        "Taureau":"Le Taureau solaire ancre votre âme dans la beauté, la stabilité et la construction patiente. Vous êtes ici pour créer du beau et du durable. L'ombre : la résistance au changement et l'attachement matériel.",
+        "Gémeaux":"Les Gémeaux solaires font de vous un messager entre les mondes — entre les idées et les personnes, entre le passé et le futur. L'ombre : la dispersion et l'incapacité à approfondir.",
+        "Cancer":"Le Cancer solaire vous connecte aux racines — familiales, émotionnelles, ancestrales. Vous êtes ici pour nourrir et protéger. L'ombre : la dépendance émotionnelle et la difficulté à lâcher prise.",
+        "Lion":"Le Lion solaire vous invite à rayonner pleinement, à créer et à diriger avec le cœur. Vous êtes ici pour être une source de lumière et de chaleur. L'ombre : l'ego démesuré et le besoin d'applaudissements.",
+        "Vierge":"La Vierge solaire vous place au service du monde à travers la précision et l'humilité. Vous êtes ici pour discerner, purifier et servir. L'ombre : le perfectionnisme paralysant et l'autocritique destructrice.",
+        "Balance":"La Balance solaire vous oriente vers la justice, la beauté et l'harmonie relationnelle. Vous êtes ici pour créer des ponts et équilibrer les opposés. L'ombre : l'indécision chronique et la dépendance à l'autre.",
+        "Scorpion":"Le Scorpion solaire vous plonge dans les profondeurs de la psyché et du mystère. Vous êtes ici pour transformer, mort après mort symbolique. L'ombre : la manipulation et la rancune.",
+        "Sagittaire":"Le Sagittaire solaire projette votre âme vers les grandes vérités et les horizons lointains. Vous êtes ici pour enseigner et inspirer. L'ombre : le dogmatisme et la fuite des responsabilités quotidiennes.",
+        "Capricorne":"Le Capricorne solaire forge votre âme par la discipline et l'accomplissement. Vous êtes ici pour construire des structures qui durent et incarner la sagesse dans le monde. L'ombre : la froideur et l'ambition sans âme.",
+        "Verseau":"Le Verseau solaire vous connecte à la vision collective et à l'humanité. Vous êtes ici pour servir l'évolution du groupe. L'ombre : le détachement émotionnel et la rébellion pour la rébellion.",
+        "Poissons":"Les Poissons solaires dissolvent les frontières entre vous et le cosmos. Vous êtes ici pour la compassion universelle et la fusion avec le divin. L'ombre : la fuite dans l'illusion et la position de victime."
+    };
+    const moonDepth = {
+        "Bélier":"Vos réflexes émotionnels sont impulsifs et directs. Vous réagissez vite, parfois trop. Votre confort instinctif est dans l'action et la compétition — mais votre croissance est dans la patience.",
+        "Taureau":"Vos réflexes émotionnels cherchent la stabilité et la sécurité matérielle. Vous avez besoin de confort physique pour vous sentir en sécurité. Votre croissance est dans l'acceptation du changement.",
+        "Gémeaux":"Vos réflexes émotionnels sont mentaux et verbaux. Vous intellectualisez vos émotions plutôt que de les ressentir. Votre croissance est dans la pleine présence émotionnelle.",
+        "Cancer":"Vos réflexes émotionnels sont profondément instinctifs et familiaux. Vous revenez toujours aux sources — famille, passé, souvenirs. Votre croissance est dans la construction de nouvelles racines.",
+        "Lion":"Vos réflexes émotionnels cherchent la reconnaissance et la chaleur. Vous avez besoin d'être vu(e) et apprécié(e) pour vous sentir bien. Votre croissance est dans l'amour de soi sans validation externe.",
+        "Vierge":"Vos réflexes émotionnels analysent et critiquent. Vous vous sentez mieux quand tout est 'en ordre'. Votre croissance est dans l'acceptation de l'imperfection.",
+        "Balance":"Vos réflexes émotionnels cherchent l'harmonie et évitent le conflit à tout prix. Votre croissance est dans le courage de votre vérité, même si elle déplaît.",
+        "Scorpion":"Vos réflexes émotionnels plongent dans l'intensité et la profondeur. Vous ressentez tout de manière extrême. Votre croissance est dans la confiance et le lâcher prise.",
+        "Sagittaire":"Vos réflexes émotionnels cherchent la liberté et l'aventure. Vous fuyez ce qui vous confine. Votre croissance est dans l'engagement et la profondeur.",
+        "Capricorne":"Vos réflexes émotionnels se réfugient dans le contrôle et la structure. Vous gérez vos émotions plutôt que vous ne les vivez. Votre croissance est dans la vulnérabilité.",
+        "Verseau":"Vos réflexes émotionnels se détachent et observent. Vous avez du mal à vous laisser aller émotionnellement. Votre croissance est dans la connexion intime et la chaleur.",
+        "Poissons":"Vos réflexes émotionnels s'immergent et se dissoudent. Vous absorbez les émotions de tout le monde comme une éponge. Votre croissance est dans la définition de limites saines."
+    };
+
+    document.getElementById('interp-sun-moon').innerHTML = `
+        <div class="mb-5 p-5 bg-yellow-950/20 rounded-xl border border-yellow-900/30">
+            <h6 class="text-yellow-400 cinzel text-sm font-bold mb-3">☉ Le Soleil en ${data.astro.sun.sign} ${data.astro.sun.symbol} — Le Véhicule de l'Âme</h6>
+            <p class="text-slate-300 text-sm leading-relaxed mb-3">En astrologie ésotérique, le Soleil n'est pas votre 'vrai moi' — c'est le véhicule que votre Âme a choisi pour cette incarnation. Le signe solaire décrit le <em>masque lumineux</em> à travers lequel votre âme cherche à s'exprimer dans le monde.</p>
+            <p class="text-slate-300 text-sm leading-relaxed">${zodiacDepth[data.astro.sun.sign] || 'Votre soleil porte une énergie unique à explorer.'}</p>
+        </div>
+        <div class="mb-5 p-5 bg-blue-950/20 rounded-xl border border-blue-900/30">
+            <h6 class="text-blue-300 cinzel text-sm font-bold mb-3">☽ La Lune en ${data.astro.moon.sign} ${data.astro.moon.symbol} — La Prison Karmique</h6>
+            <p class="text-slate-300 text-sm leading-relaxed mb-3">La Lune en astrologie ésotérique représente vos <em>réflexes karmiques</em> — les automatismes émotionnels et instinctifs hérités de vies antérieures. C'est la 'prison' lumineuse que votre âme cherche à transcender pour laisser le Soleil rayonner pleinement.</p>
+            <p class="text-slate-300 text-sm leading-relaxed">${moonDepth[data.astro.moon.sign] || 'Votre lune porte une sagesse karmique profonde.'}</p>
+        </div>
+        <div class="p-4 bg-indigo-900/20 rounded-xl border border-indigo-900/30">
+            <h6 class="text-indigo-300 cinzel text-sm font-bold mb-2">⚗ L'Alchimie Soleil/Lune</h6>
+            <p class="text-slate-300 text-sm leading-relaxed">La croissance spirituelle ne consiste pas à détruire votre Lune en ${data.astro.moon.sign} — mais à <strong>maîtriser ses automatismes</strong> pour qu'elle devienne le sol fertile dans lequel votre Soleil en ${data.astro.sun.sign} peut planter ses racines et s'élever. Quand ces deux forces s'harmonisent, votre rayonnement devient authentique et puissant.</p>
+        </div>`;
+
+    const rayInfo = RAYONS.find(r => r.num === data.astro.soulRay.num) || RAYONS[0];
+    document.getElementById('interp-soul-ray').innerHTML = `
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-4 h-4 rounded-full" style="background:${rayInfo.color||'#bf953f'};box-shadow:0 0 12px ${rayInfo.color||'#bf953f'}"></div>
+            <span class="text-white font-bold cinzel">${rayInfo.name}</span>
+        </div>
+        ${rayInfo.desc}`;
+
+    drawAstrologyChart(data.astro);
+
+    // ── BAZI ──
+    renderBazi(data.bazi);
+
+    // ── JYOTISH ──
+    renderJyotish(data.jyotish, dob);
+
+    // ── TAROT ──
+    const { soulCard, persCard, yearCard, lifePathNum } = data.tarot;
+
+    const arcanaDeep = {
+        0:{light:"L'innocence sacrée, la confiance absolue, le commencement de tous les voyages. L'âme qui ose tout quitter pour suivre l'appel de l'univers.", shadow:"La naïveté dangereuse, l'irresponsabilité, la fuite permanente de tout engagement.", pratique:"Osez un commencement sans garantie. Faites confiance au processus même quand vous ne voyez pas la destination."},
+        1:{light:"La maîtrise de la volonté créatrice. Vous possédez tous les outils — il s'agit maintenant de les utiliser avec intention et présence totale.", shadow:"La manipulation, l'utilisation des pouvoirs à des fins égoïstes, le charlatan.", pratique:"Identifiez un domaine où vous dispersez votre énergie et canalisez toute votre volonté vers un seul objectif précis."},
+        2:{light:"La gardienne des mystères cachés. Sagesse intuitive profonde, connaissance secrète, accès aux plans subtils de la réalité.", shadow:"L'isolement, le mystère pour le mystère, la passivité excessive, l'hermétisme stérile.", pratique:"Accordez-vous des moments de silence profond. Écoutez ce qui émerge dans le calme. Tenez un journal de vos rêves."},
+        3:{light:"La grande mère cosmique. Créativité abondante, fertilité, beauté, amour nourricier, connexion à la nature et au corps.", shadow:"La dépendance aux autres, la sur-protection, la création compulsive sans discernement.", pratique:"Créez quelque chose de beau cette semaine — cuisine, jardinage, art, musique. Nourrissez quelqu'un avec amour."},
+        4:{light:"La structure, la sécurité, l'autorité bienveillante. Construction de fondations durables, protection des plus faibles.", shadow:"La rigidité tyrannique, le contrôle excessif, l'incapacité à lâcher prise.", pratique:"Définissez des règles claires pour votre vie. Créez une structure qui vous libère plutôt qu'elle ne vous emprisonne."},
+        5:{light:"La transmission de la sagesse ancestrale, le pont entre l'humain et le divin, l'enseignement spirituel.", shadow:"Le dogmatisme, la conformité aveugle, l'abus d'autorité spirituelle.", pratique:"Cherchez un mentor ou devenez le mentor de quelqu'un. Transmettez ce que vous savez avec humilité."},
+        6:{light:"L'amour conscient, le choix aligné avec les valeurs profondes, l'union des opposés intérieurs.", shadow:"L'indécision chronique, les choix guidés par la peur, les dépendances affectives.", pratique:"Examinez vos choix actuels : sont-ils guidés par l'amour ou par la peur ? Choisissez délibérément depuis votre cœur."},
+        7:{light:"La victoire par la maîtrise de soi et la direction de vos énergies contraires vers un but commun.", shadow:"L'autoritarisme, la victoire à tout prix, le contrôle brutal des émotions.", pratique:"Identifiez deux forces intérieures opposées en vous et cherchez comment les faire travailler ensemble vers un même but."},
+        8:{light:"La puissance douce et courageuse qui dompte les instincts primitifs par l'amour plutôt que par la force.", shadow:"La cruauté, la domination brutale, la répression des instincts au lieu de leur intégration.", pratique:"Face à une situation difficile, choisissez la douceur et la compassion là où vous auriez réagi par la force."},
+        9:{light:"La sagesse de la solitude intérieure, la quête de vérité, la lumière portée dans les ténèbres.", shadow:"L'isolement pathologique, l'arrogance du 'sage', le refus de partager sa lumière.", pratique:"Accordez-vous une journée de retraite et de réflexion profonde. Qu'est-ce que votre lumière intérieure cherche à éclairer ?"},
+        10:{light:"La compréhension des cycles cosmiques, l'acceptation des hauts et des bas, le centre immuable dans la tempête.", shadow:"La passivité fataliste, la soumission à la chance, le refus de prendre sa destinée en main.", pratique:"Identifiez dans quel cycle vous vous trouvez actuellement. Que vous enseigne ce moment précis de la roue ?"},
+        11:{light:"L'intégrité absolue, la vérité sans compromis, la justice karmique, l'équilibre parfait.", shadow:"La rigidité morale, le jugement sans miséricorde, la froide application de la loi.", pratique:"Examinez une situation dans votre vie où vous avez besoin de plus d'honnêteté. Dites votre vérité avec douceur."},
+        12:{light:"La révélation par le sacrifice volontaire, la nouvelle perspective née du lâcher prise.", shadow:"Le martyre compulsif, la victimisation, l'immobilité par passivité.", pratique:"Identifiez quelque chose que vous devez lâcher. Permettez-vous de voir la situation à l'envers — et observez ce qui apparaît."},
+        13:{light:"La grande transformation, la renaissance après la mort symbolique, la transmutation alchimique.", shadow:"La peur panique du changement, la destruction pour la destruction, la résistance à l'inévitable.", pratique:"Acceptez qu'une porte se ferme en ce moment. Cherchez le nouveau cycle qui commence derrière cette fin."},
+        14:{light:"L'alchimie de la patience, l'harmonie née de la fusion des opposés, la guérison profonde.", shadow:"L'excès de prudence, l'inaction perpétuelle, la médiocrité du juste milieu.", pratique:"Mélangez deux aspects contradictoires de votre personnalité et créez quelque chose de nouveau à partir de leur tension."},
+        15:{light:"La reconnaissance de vos chaînes auto-imposées, la libération par la conscience.", shadow:"L'addiction, la soumission aux peurs, la complaisance dans les illusions confortables.", pratique:"Identifiez une chaîne que vous portez volontairement. Que se passerait-il si vous décidiez simplement de la retirer ?"},
+        16:{light:"L'éveil brutal et libérateur, la chute des structures rigides et des illusions, la fondation pour du neuf.", shadow:"Le catastrophisme, la destruction évitable par l'orgueil, le refus de voir les signaux d'alerte.", pratique:"Cherchez où dans votre vie une structure rigide doit être démolie pour que quelque chose de plus vrai puisse émerger."},
+        17:{light:"L'espoir pur après l'épreuve, la guidance divine, la guérison par la confiance et l'authenticité.", shadow:"La naïveté utopique, la foi sans discernement, l'attente passive des miracles.", pratique:"Partagez un espoir ou un rêve que vous avez gardé secret. Donnez de votre temps ou de votre énergie à quelqu'un qui en a besoin."},
+        18:{light:"Le voyage dans les profondeurs de l'inconscient, l'intégration des peurs et des illusions.", shadow:"La paranoïa, les peurs irrationnelles, la confusion entre réalité et projection.", pratique:"Explorez un rêve récent ou une peur récurrente. Qu'est-ce qu'elle vous dit de vos profondeurs ?"},
+        19:{light:"La joie pure, le rayonnement authentique, la vitalité partagée, la conscience solaire.", shadow:"L'arrogance solaire, l'ego gonflé, l'incapacité à reconnaître les ombres.", pratique:"Partagez ce qui vous rend heureux(se) avec abandon total. Rayonnez sans retenue et observez ce que cela génère."},
+        20:{light:"L'appel à l'éveil, la réponse à une vocation plus haute, la résurrection de ce qui était endormi.", shadow:"L'apitoiement sur soi, le refus de répondre à l'appel, la culpabilité paralysante.", pratique:"Qu'est-ce que votre âme cherche à ressusciter en vous ? Répondez à cet appel par une action concrète aujourd'hui."},
+        21:{light:"L'accomplissement et l'intégration cosmique, la danse avec le monde, la conscience élargie.", shadow:"Le perfectionnisme qui empêche de conclure, la peur du vide après l'accomplissement.", pratique:"Célébrez un accomplissement récent, même modeste. Reconnaissez le chemin parcouru avant de vous élancer vers le prochain cycle."}
+    };
+
+    const fillTarotCard = (prefix, card) => {
+        document.getElementById(`tarot-${prefix}-symbol`).textContent = card.symbol;
+        document.getElementById(`tarot-${prefix}-name`).textContent = card.name;
+        document.getElementById(`tarot-${prefix}-number`).textContent = `Arcane ${card.num === 0 ? '0 — Le Fou' : card.num}`;
+        const deep = arcanaDeep[card.num] || {};
+        document.getElementById(`tarot-${prefix}-desc`).innerHTML = `
+            <p class="text-slate-300 text-sm leading-relaxed mb-3">${card.desc}</p>
+            ${deep.light ? `<div class="mt-2 p-3 bg-yellow-950/20 rounded-lg border border-yellow-900/20"><span class="block text-yellow-400 text-[10px] uppercase tracking-wider mb-1">✦ Lumière</span><p class="text-slate-300 text-xs">${deep.light}</p></div>` : ''}
+            ${deep.shadow ? `<div class="mt-2 p-3 bg-red-950/20 rounded-lg border border-red-900/20"><span class="block text-red-400 text-[10px] uppercase tracking-wider mb-1">◈ Ombre</span><p class="text-slate-400 text-xs">${deep.shadow}</p></div>` : ''}
+            ${deep.pratique ? `<div class="mt-2 p-3 bg-emerald-950/20 rounded-lg border border-emerald-900/20"><span class="block text-emerald-400 text-[10px] uppercase tracking-wider mb-1">⚗ Pratique</span><p class="text-slate-300 text-xs">${deep.pratique}</p></div>` : ''}`;
+    };
+    fillTarotCard('soul', soulCard);
+    fillTarotCard('pers', persCard);
+    fillTarotCard('year', yearCard);
+
+    document.getElementById('tarot-lifenum').textContent = lifePathNum;
+    document.getElementById('tarot-lifenum-desc').innerHTML = `
+        <p class="text-slate-300 text-base leading-relaxed mb-4">${LIFE_PATH_MEANINGS[lifePathNum] || LIFE_PATH_MEANINGS[lifePathNum % 9 || 9]}</p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+            <div class="p-3 bg-yellow-950/20 border border-yellow-900/30 rounded-lg"><span class="block text-yellow-400 uppercase tracking-wider mb-1">Vibration</span><span class="text-white">${lifePathNum <= 9 ? 'Nombre simple' : 'Nombre Maître ✦'}</span></div>
+            <div class="p-3 bg-yellow-950/20 border border-yellow-900/30 rounded-lg"><span class="block text-yellow-400 uppercase tracking-wider mb-1">Couleur</span><span class="text-white">${['','Rouge','Orange','Jaune','Vert','Bleu','Indigo','Violet','Rose','Or','Argent','Blanc','Platine'][lifePathNum] || 'Or'}</span></div>
+            <div class="p-3 bg-yellow-950/20 border border-yellow-900/30 rounded-lg"><span class="block text-yellow-400 uppercase tracking-wider mb-1">Pierre</span><span class="text-white">${['','Rubis','Cornaline','Citrine','Émeraude','Saphir','Améthyste','Améthyste','Tourmaline Rose','Or','Diamant','Aigue-marine','Diamant'][lifePathNum] || 'Quartz'}</span></div>
+        </div>`;
+
+    document.getElementById('tarot-synthesis').innerHTML = `
+        <div class="bg-yellow-950/20 border border-yellow-900/30 rounded-xl p-5">
+            <h5 class="cinzel text-yellow-400 mb-3 text-sm">L'Archétype de l'Âme — ${soulCard.name} (Arcane ${soulCard.num})</h5>
+            <p class="text-slate-300 text-sm leading-relaxed mb-3">Votre carte de l'âme est calculée à partir de la réduction numérologique de votre date de naissance complète. Elle révèle la vibration fondamentale qui traverse <em>toutes vos incarnations</em> — l'archétype que votre âme cherche à incarner et maîtriser dans sa trajectoire évolutive.</p>
+            <p class="text-slate-400 text-sm italic">L'énergie du ${soulCard.name} vous invite à : ${arcanaDeep[soulCard.num]?.pratique || soulCard.desc}</p>
+        </div>
+        <div class="bg-blue-950/20 border border-blue-900/30 rounded-xl p-5">
+            <h5 class="cinzel text-blue-400 mb-3 text-sm">La Personnalité Visible — ${persCard.name} (Arcane ${persCard.num})</h5>
+            <p class="text-slate-300 text-sm leading-relaxed mb-3">Calculée à partir du jour et du mois de naissance, cette carte décrit <em>comment vous vous manifestez</em> aux yeux du monde — votre style naturel de présence, vos réactions instinctives, la façon dont vous abordez la vie quotidienne.</p>
+            <p class="text-slate-400 text-sm italic">L'ombre du ${persCard.name} à surveiller : ${arcanaDeep[persCard.num]?.shadow || ''}</p>
+        </div>
+        <div class="bg-emerald-950/20 border border-emerald-900/30 rounded-xl p-5">
+            <h5 class="cinzel text-emerald-400 mb-3 text-sm">Le Cycle Actuel — ${yearCard.name} (Arcane ${yearCard.num})</h5>
+            <p class="text-slate-300 text-sm leading-relaxed mb-3">Cette carte gouverne votre année cosmique en cours (${new Date().getFullYear()}). Elle indique les thèmes, défis et opportunités dominants. Chaque année personnelle a sa propre couleur vibratoire — et le Tarot vous révèle quelle énergie est la plus active en ce moment.</p>
+            <p class="text-slate-400 text-sm italic">Pratique pour ce cycle : ${arcanaDeep[yearCard.num]?.pratique || ''}</p>
+        </div>
+        <div class="bg-purple-950/20 border border-purple-900/30 rounded-xl p-5">
+            <h5 class="cinzel text-purple-400 mb-3 text-sm">La Convergence des Trois Arcanes</h5>
+            <p class="text-slate-300 text-sm leading-relaxed">La combinaison de votre Arcane de l'Âme (${soulCard.name}), de Personnalité (${persCard.name}) et de l'Année (${yearCard.name}) crée une constellation unique. ${soulCard.name} définit <em>qui vous êtes</em> au niveau de l'âme. ${persCard.name} détermine <em>comment vous agissez</em>. ${yearCard.name} révèle <em>ce que vous traversez</em> maintenant. La sagesse est de lire ces trois niveaux ensemble.</p>
+        </div>`;
+
+    // ── SYNTHESIS ──
+    const hdGift = t.notSelf === 'Amertume' ? 'guider avec une précision chirurgicale en voyant les systèmes là où les autres ne voient que le chaos' : t.notSelf === 'Frustration' ? 'construire et manifester avec une énergie vitale inépuisable au service de ce qui vous passionne' : t.notSelf === 'Colère' ? 'initier des changements courageux et ouvrir de nouvelles voies là où les autres hésitent' : "refléter et révéler la vérité de votre communauté avec une sagesse que nul ne possède";
+    document.getElementById('synth-mission').innerHTML = `En tant que <strong>${t.name}</strong> portant la <strong>${data.hd.cross.name}</strong>, votre mission cosmique est de ${data.hd.cross.desc.toLowerCase()} Votre Soleil en ${data.astro.sun.sign} et votre Chemin de Vie ${lifePathNum} confirment cette direction : transformer votre rayonnement naturel en service authentique et durable pour ceux qui vous entourent.`;
+    document.getElementById('synth-gift').innerHTML = `Votre combinaison unique de ${t.name} (Design Humain) et de Rayon ${data.astro.soulRay.num} (Astrologie Ésotérique) crée un don extraordinaire : la capacité de <em>${hdGift}</em>. L'arcane ${persCard.name} renforce et colore ce don — il indique <em>comment</em> vous l'exprimez naturellement dans le monde.`;
+    document.getElementById('synth-shadow').innerHTML = `Votre ombre principale réside dans le thème du Non-Soi : <strong>${t.notSelf}</strong>. ${t.notSelfDesc} Couplée aux tendances karmiques du Nœud Sud en ${data.astro.southNode.sign} et à l'ombre de l'arcane ${yearCard.name} (<em>${arcanaDeep[yearCard.num]?.shadow || ''}</em>), elle forme votre principale zone de croissance cette incarnation.`;
+
+    const mantras = [
+        `"Je fais confiance à mon corps. Je réponds à ce qui m'appelle. Je construis ce qui me passionne."`,
+        `"Mon autorité est intérieure. Ma présence est un don. Je guide ceux qui demandent ma lumière."`,
+        `"Je transmute mes ombres en sagesse. Je suis le pont vivant entre le ciel et la terre."`,
+        `"Ma présence est ma puissance. Je vis aligné(e) avec mon dessein cosmique unique."`
+    ];
+    const rngSynth = new DeterministicRandom(hashString(data.seed + 'mantra'));
+    document.getElementById('synth-mantra').textContent = rngSynth.pick(mantras);
+
+    const alignments = [
+        { icon:"⬡", title:"Stratégie de Vie (Design Humain)", text:`En tant que <strong>${t.name}</strong>, votre stratégie quotidienne est de <strong>${t.strategy}</strong>. Appliquez-la à chaque décision importante — grande ou petite. Observez comment votre vie change quand vous cessez de lutter contre votre propre nature.` },
+        { icon:"☊", title:"Direction Karmique (Nœuds Lunaires)", text:`Votre Nœud Nord en <strong>${data.astro.northNode.sign}</strong> est votre boussole d'évolution. À chaque carrefour de vie, demandez-vous : 'Ce choix m'emmène-t-il vers les qualités du ${data.astro.northNode.sign} ?' C'est là que réside votre véritable épanouissement.` },
+        { icon:"✦", title:"Pratique Spirituelle (Rayon d'Âme)", text:`Votre Rayon ${data.astro.soulRay.num} vous invite à cultiver ${data.astro.soulRay.num === 1 ? 'le courage de transformer ce qui doit l\'être' : data.astro.soulRay.num === 2 ? 'l\'amour-sagesse dans toutes vos relations' : data.astro.soulRay.num === 3 ? 'l\'intelligence appliquée à construire de vastes systèmes' : data.astro.soulRay.num === 4 ? 'la créativité comme voie de guérison des conflits' : data.astro.soulRay.num === 5 ? 'la rigueur analytique au service de la vérité spirituelle' : data.astro.soulRay.num === 6 ? 'la dévotion envers votre idéal le plus pur' : 'l\'ordre et la beauté comme expressions du divin dans le monde'}. Une pratique quotidienne de 15 minutes (méditation, journaling, contemplation) suffit pour maintenir l'alignement.` },
+        { icon:"🃏", title:"Leçon du Cycle (Tarot)", text:`L'arcane ${yearCard.name} gouverne votre cycle actuel. Sa pratique essentielle : <em>${arcanaDeep[yearCard.num]?.pratique || 'Observez attentivement ce qui se présente dans votre vie en ce moment.'}</em> Cette leçon prépare le prochain cycle de votre évolution.` }
+    ];
+    document.getElementById('synth-alignment').innerHTML = alignments.map(a => `
+        <div class="flex gap-4 p-5 bg-slate-800/30 rounded-xl border border-slate-700/50">
+            <div class="text-2xl w-10 shrink-0 text-yellow-400 text-center">${a.icon}</div>
+            <div><h5 class="cinzel text-white text-sm mb-2">${a.title}</h5><p class="text-slate-300 text-sm leading-relaxed">${a.text}</p></div>
+        </div>`).join('');
+
+    const dateObj2 = new Date(dob + 'T12:00:00');
+    const birthYear = dateObj2.getFullYear();
+    const currentYear = new Date().getFullYear();
+    const age = currentYear - birthYear;
+    const periods = [
+        { range:`0–28 ans`, theme:`Formation & Fondations`, active: age < 28, desc:`La première grande période de votre vie (${birthYear}–${birthYear+28}) est gouvernée par votre <strong>Lune en ${data.astro.moon.sign}</strong>. C'est la phase de la formation de la personnalité, du conditionnement familial et de l'exploration de votre nature émotionnelle profonde. Les blessures de cette période deviennent les matières premières de votre transformation. Votre Profil ${data.hd.profile} commence à se manifester — souvent de façon inconsciente et instinctive.` },
+        { range:`28–56 ans`, theme:`Incarnation & Mission`, active: age >= 28 && age < 56, desc:`La deuxième période (${birthYear+28}–${birthYear+56}) est dominée par votre <strong>Soleil en ${data.astro.sun.sign}</strong>. C'est la phase de l'expression pleine et mûrie de votre potentiel cosmique. Votre Croix d'Incarnation (${data.hd.cross.name}) devient de plus en plus consciente et assumée. C'est ici que votre mission principale se déploie, que vos dons se cristallisent et que votre impact dans le monde devient tangible.` },
+        { range:`56 ans et au-delà`, theme:`Sagesse & Transmission`, active: age >= 56, desc:`La troisième période (à partir de ${birthYear+56}) est placée sous le signe de <strong>Saturne</strong> et de votre <strong>Nœud Nord en ${data.astro.northNode.sign}</strong>. C'est la phase de la maturité spirituelle — où tout ce qui a été vécu, souffert, transformé et intégré se cristallise en une sagesse authentique, vivante, transmissible. L'archétype du ${soulCard.name} atteint sa pleine expression.` }
+    ];
+    document.getElementById('synth-periods').innerHTML = periods.map(p => `
+        <div class="flex gap-5 p-5 rounded-xl border ${p.active ? 'border-yellow-600/60 bg-yellow-950/20 shadow-[0_0_20px_rgba(191,149,63,0.1)]' : 'border-slate-700/50 bg-slate-800/20'}">
+            ${p.active ? '<div class="shrink-0 w-1.5 rounded-full bg-yellow-500 self-stretch"></div>' : '<div class="shrink-0 w-1.5 rounded-full bg-slate-700 self-stretch"></div>'}
+            <div>
+                <div class="flex items-center gap-3 mb-2">
+                    <p class="text-yellow-500 cinzel text-sm font-bold">${p.range}</p>
+                    <span class="text-[10px] uppercase tracking-wider ${p.active ? 'text-yellow-400 bg-yellow-900/40' : 'text-slate-500 bg-slate-800'} px-2 py-0.5 rounded-full">${p.active ? '● Période active' : p.theme}</span>
+                </div>
+                <p class="text-slate-300 text-sm leading-relaxed">${p.desc}</p>
+            </div>
+        </div>`).join('');
+}
+
+// =============================================
+// RENDER: BAZI (Quatre Piliers de la Destinée)
+// =============================================
+function renderBazi(bazi) {
+    const { pillars, elements } = bazi;
+    const pillarLabels = { year:"Année", month:"Mois", day:"Jour", hour:"Heure" };
+
+    // Pillar cards
+    document.getElementById('bazi-pillars').innerHTML = ['year','month','day','hour'].map(key => {
+        const p = pillars[key];
+        const stemColor = BAZI_ELEMENTS[p.stem.element].color;
+        const branchColor = BAZI_ELEMENTS[p.branch.element].color;
+        return `
+        <div class="bg-slate-800/50 border border-slate-700 rounded-lg p-2">
+            <p class="text-[9px] uppercase tracking-wider text-slate-400 mb-1">${pillarLabels[key]}${key==='day' ? ' <span class="text-yellow-400">★</span>' : ''}</p>
+            <div class="text-2xl mb-1" style="color:${stemColor}; text-shadow:0 0 8px ${stemColor}66;">${p.stem.symbol}</div>
+            <p class="text-[9px] text-slate-300 leading-tight mb-2">${p.stem.name}</p>
+            <div class="text-xl mb-1" style="color:${branchColor}; text-shadow:0 0 8px ${branchColor}66;">${p.branch.symbol}</div>
+            <p class="text-[9px] text-slate-300 leading-tight">${p.branch.animal}</p>
+        </div>`;
+    }).join('');
+
+    // Element balance bars
+    const maxCount = Math.max(...Object.values(elements), 1);
+    document.getElementById('bazi-elements-bar').innerHTML = Object.entries(elements).map(([el, count]) => `
+        <div class="flex items-center gap-2 text-xs">
+            <span class="w-12 text-slate-400">${el}</span>
+            <div class="flex-1 h-2.5 bg-slate-800 rounded-full overflow-hidden">
+                <div class="h-full rounded-full" style="width:${(count/maxCount*100)||0}%; background:${BAZI_ELEMENTS[el].color}; box-shadow:0 0 8px ${BAZI_ELEMENTS[el].color}88;"></div>
+            </div>
+            <span class="w-4 text-right text-slate-500">${count}</span>
+        </div>`).join('');
+
+    const dayMaster = pillars.day.stem;
+    const dominant = Object.entries(elements).sort((a,b) => b[1]-a[1])[0][0];
+    const lackingEntry = Object.entries(elements).sort((a,b) => a[1]-b[1])[0];
+    const lacking = lackingEntry[1] === 0 ? lackingEntry[0] : "Aucun";
+
+    // Simplified favorable element heuristic: the element that produces the Day Master's element
+    // when it is weak (dominant ≠ Day Master's element), otherwise the element it controls to drain its excess.
+    const dmElement = dayMaster.element;
+    let favorable;
+    if (dominant === dmElement) {
+        // Day Master strong → favor the element it produces (to release/drain the excess) or that controls it
+        favorable = ELEMENT_CYCLE[(ELEMENT_CYCLE.indexOf(dmElement) + 1) % 5];
+    } else {
+        // Day Master weak/neutral → favor the element that produces it
+        favorable = ELEMENT_CYCLE[(ELEMENT_CYCLE.indexOf(dmElement) + 4) % 5];
+    }
+
+    document.getElementById('bazi-daymaster').textContent = `${dayMaster.symbol} ${dayMaster.name}`;
+    document.getElementById('bazi-animal').textContent = `${pillars.year.branch.symbol} ${pillars.year.branch.animal}`;
+    document.getElementById('bazi-dominant').textContent = dominant;
+    document.getElementById('bazi-lacking').textContent = lacking;
+    document.getElementById('bazi-favorable').textContent = favorable;
+
+    document.getElementById('interp-bazi-daymaster').innerHTML = `
+        Votre Maître du Jour — le pilier central de votre carte BaZi — est <strong>${dayMaster.name} (${dayMaster.symbol})</strong>. ${dayMaster.trait}<br><br>
+        C'est ce pilier, et lui seul, qui représente <em>vous-même</em> dans le système des Quatre Piliers : tous les autres piliers (année, mois, heure) décrivent votre relation aux autres et aux cycles de vie, mais le Jour est votre identité profonde, votre essence énergétique irréductible.`;
+
+    document.getElementById('bazi-pillars-interp').innerHTML = [
+        { key:'year', title:"Pilier de l'Année — Les Ancêtres & l'Enfance", desc:`Gouverné par ${pillars.year.stem.name} (${pillars.year.stem.symbol}) et l'animal ${pillars.year.branch.animal} (${pillars.year.branch.symbol}), ce pilier décrit votre héritage familial, votre image publique et l'énergie de votre petite enfance. ${pillars.year.branch.trait}` },
+        { key:'month', title:"Pilier du Mois — Les Parents & la Carrière", desc:`Gouverné par ${pillars.month.stem.name} (${pillars.month.stem.symbol}) et l'animal ${pillars.month.branch.animal} (${pillars.month.branch.symbol}), ce pilier — le plus influent après le Jour — décrit votre environnement social, votre carrière et votre relation à l'autorité parentale.` },
+        { key:'day', title:"Pilier du Jour — Le Conjoint & le Soi Profond", desc:`La branche du Jour (${pillars.day.branch.animal}, ${pillars.day.branch.symbol}) est votre 'palais du conjoint' : elle colore votre vie relationnelle intime. ${pillars.day.branch.trait}` },
+        { key:'hour', title:"Pilier de l'Heure — Les Enfants & l'Avenir", desc:`Gouverné par ${pillars.hour.stem.name} (${pillars.hour.stem.symbol}) et l'animal ${pillars.hour.branch.animal} (${pillars.hour.branch.symbol}), ce pilier révèle votre postérité, vos projets à long terme et la façon dont vous laissez votre empreinte dans le monde.` }
+    ].map(p => `
+        <div class="bg-slate-800/30 border border-slate-700/50 rounded-xl p-4">
+            <h6 class="cinzel text-sm text-yellow-400 mb-2">${p.title}</h6>
+            <p class="text-slate-300 text-sm leading-relaxed">${p.desc}</p>
+        </div>`).join('');
+
+    document.getElementById('interp-bazi-elements').innerHTML = `
+        Votre élément dominant est le <strong style="color:${BAZI_ELEMENTS[dominant].color}">${dominant}</strong> (${BAZI_ELEMENTS[dominant].keyword}). ${BAZI_ELEMENTS[dominant].light}<br><br>
+        ${lacking !== "Aucun" ? `L'élément le plus absent de votre carte est le <strong style="color:${BAZI_ELEMENTS[lacking].color}">${lacking}</strong> — un territoire que vous devez apprendre à cultiver consciemment, car il ne vous est pas donné naturellement. Son ombre non intégrée : <em>${BAZI_ELEMENTS[lacking].shadow}</em>` : `Votre carte présente les cinq éléments en proportions relativement équilibrées — une configuration rare qui offre une grande adaptabilité, au prix parfois d'une identité moins tranchée.`}`;
+
+    document.getElementById('interp-bazi-favorable').innerHTML = `
+        Selon l'équilibre de votre Maître du Jour (${dayMaster.element}) face aux forces en présence, l'élément qui vous soutient le mieux — votre <em>Yong Shen</em> — est le <strong style="color:${BAZI_ELEMENTS[favorable].color}">${favorable}</strong>. ${BAZI_ELEMENTS[favorable].light}<br><br>
+        Concrètement : privilégiez les couleurs, les directions, les environnements et les activités associés à cet élément (${favorable === "Bois" ? "vert, croissance, nature, projets à long terme" : favorable === "Feu" ? "rouge, chaleur, visibilité, mouvement" : favorable === "Terre" ? "jaune/ocre, stabilité, ancrage, routines" : favorable === "Métal" ? "blanc/or, structure, précision, minimalisme" : "bleu/noir, fluidité, introspection, voyage"}) pour renforcer votre équilibre énergétique.`;
+}
+
+// =============================================
+// RENDER: JYOTISH (Thème Natal Védique)
+// =============================================
+function renderJyotish(jyotish, dob) {
+    const { lagnaRashi, moonRashi, nakshatra, moonPada, grahaPlacements } = jyotish;
+    const dasha = computeCurrentDasha(jyotish, dob);
+
+    document.getElementById('jyotish-lagna').textContent = lagnaRashi.name;
+    document.getElementById('jyotish-rashi').textContent = moonRashi.name;
+    document.getElementById('jyotish-nakshatra').textContent = `${nakshatra.name} — Pada ${moonPada}`;
+    document.getElementById('jyotish-dasha').textContent = `${dasha.lord} (${dasha.startYear}–${dasha.endYear})`;
+
+    document.getElementById('interp-jyotish-lagna').innerHTML = `
+        Votre Lagna (Ascendant sidéral) se lève en <strong>${lagnaRashi.name}</strong>, régi par ${lagnaRashi.lord}. ${lagnaRashi.trait}<br><br>
+        Contrairement au Soleil, le Lagna change environ toutes les deux heures : il représente le corps physique, le tempérament instinctif et la porte d'entrée à travers laquelle votre âme s'incarne dans la matière. C'est le point de départ de toute la carte — les douze maisons (bhāvas) se comptent à partir de lui.`;
+
+    document.getElementById('interp-jyotish-rashi').innerHTML = `
+        Votre Lune sidérale repose en <strong>${moonRashi.name}</strong>, régie par ${moonRashi.lord}. ${moonRashi.trait}<br><br>
+        En Jyotish, la Lune — et non le Soleil — est considérée comme le luminaire le plus important pour comprendre l'esprit (manas), les émotions et les réactions instinctives. C'est aussi elle qui détermine votre Nakshatra de naissance et le point de départ de votre cycle de Mahādaśā.`;
+
+    document.getElementById('interp-jyotish-nakshatra').innerHTML = `
+        Votre étoile de naissance est <strong>${nakshatra.name}</strong> (Pada ${moonPada}/4), régie par la planète ${nakshatra.lord} et associée à la divinité ${nakshatra.deity}. ${nakshatra.trait}<br><br>
+        Les 27 Nakshatras découpent le zodiaque sidéral en segments de 13°20' chacun, offrant une résolution bien plus fine que les douze signes seuls. Le pada (quart d'étoile) affine encore la lecture : chacun des quatre padas de ${nakshatra.name} porte une nuance légèrement différente de la même énergie stellaire.`;
+
+    document.getElementById('interp-jyotish-dasha').innerHTML = `
+        Vous traversez actuellement la Mahādaśā de <strong>${dasha.lord}</strong>, une période planétaire s'étendant approximativement de ${dasha.startYear} à ${dasha.endYear} (de ${dasha.startAge} à ${dasha.endAge} ans). Dans le système Vimshottari, chaque planète gouverne un cycle de vie d'une durée fixe — de 6 ans pour le Soleil à 20 ans pour Vénus — activant les thèmes et les maisons qu'elle régit dans votre carte natale.<br><br>
+        Le point de départ de votre séquence de Mahādaśā est déterminé par le seigneur de votre Nakshatra lunaire (${nakshatra.lord}), ce qui relie directement votre cycle de vie planétaire à votre étoile de naissance.`;
+
+    drawJyotishChart(lagnaRashi, grahaPlacements);
+}
+
+// =============================================
+// SVG: JYOTISH NORTH-INDIAN DIAMOND CHART
+// =============================================
+function drawJyotishChart(lagnaRashi, placements) {
+    const svg = document.getElementById('jyotish-chart');
+    // Fixed North-Indian diamond layout: 12 house cells with label anchor points
+    const houseAnchors = [
+        {x:150, y:75},  // House 1 (top center)
+        {x:75,  y:37},  // House 2
+        {x:37,  y:75},  // House 3
+        {x:75,  y:150}, // House 4 (left center)
+        {x:37,  y:225}, // House 5
+        {x:75,  y:263}, // House 6
+        {x:150, y:225}, // House 7 (bottom center)
+        {x:225, y:263}, // House 8
+        {x:263, y:225}, // House 9
+        {x:225, y:150}, // House 10 (right center)
+        {x:263, y:75},  // House 11
+        {x:225, y:37}   // House 12
+    ];
+
+    const lines = `
+        <rect x="4" y="4" width="292" height="292" fill="none" stroke="rgba(191,149,63,0.5)" stroke-width="2"/>
+        <line x1="4" y1="4" x2="296" y2="296" stroke="rgba(191,149,63,0.35)" stroke-width="1"/>
+        <line x1="296" y1="4" x2="4" y2="296" stroke="rgba(191,149,63,0.35)" stroke-width="1"/>
+        <line x1="150" y1="4" x2="4" y2="150" stroke="rgba(191,149,63,0.35)" stroke-width="1"/>
+        <line x1="4" y1="150" x2="150" y2="296" stroke="rgba(191,149,63,0.35)" stroke-width="1"/>
+        <line x1="150" y1="296" x2="296" y2="150" stroke="rgba(191,149,63,0.35)" stroke-width="1"/>
+        <line x1="296" y1="150" x2="150" y2="4" stroke="rgba(191,149,63,0.35)" stroke-width="1"/>`;
+
+    const rashiShort = ["Me","Vr","Mi","Ka","Si","Kn","Tu","Vs","Dh","Ma","Ku","Mn"];
+    const houseNumberPos = [
+        {x:150,y:52},{x:52,y:20},{x:20,y:52},{x:52,y:150},
+        {x:20,y:248},{x:52,y:280},{x:150,y:248},{x:248,y:280},
+        {x:280,y:248},{x:248,y:150},{x:280,y:52},{x:248,y:20}
+    ];
+    const lagnaIdx = VEDIC_RASHIS.indexOf(lagnaRashi);
+    let houseLabels = '';
+    for (let i = 0; i < 12; i++) {
+        const rashiIdx = (lagnaIdx + i) % 12;
+        houseLabels += `<text x="${houseNumberPos[i].x}" y="${houseNumberPos[i].y}" fill="${i===0 ? '#fde047' : 'rgba(255,255,255,0.35)'}" font-size="9" text-anchor="middle" font-weight="${i===0?'bold':'normal'}">${rashiShort[rashiIdx]}</text>`;
+    }
+
+    // Group planets by house to offset overlapping labels
+    const byHouse = {};
+    placements.forEach(p => {
+        byHouse[p.house] = byHouse[p.house] || [];
+        byHouse[p.house].push(p);
+    });
+    let planetLabels = '';
+    Object.entries(byHouse).forEach(([house, plist]) => {
+        const anchor = houseAnchors[(parseInt(house) - 1 + 12) % 12];
+        plist.forEach((p, idx) => {
+            const dx = (idx - (plist.length-1)/2) * 18;
+            planetLabels += `<text x="${anchor.x + dx}" y="${anchor.y}" fill="#fcf6ba" font-size="14" text-anchor="middle" style="filter:drop-shadow(0 0 3px rgba(191,149,63,0.8))">${p.symbol}</text>`;
+        });
+    });
+
+    svg.innerHTML = lines + houseLabels + planetLabels +
+        `<text x="150" y="12" fill="rgba(191,149,63,0.6)" font-size="8" text-anchor="middle">ASC ★</text>`;
+}
+
+// =============================================
+// CANVAS: BODYGRAPH
+// =============================================
+function drawBodygraph(centers) {
+    const canvas = document.getElementById('hd-canvas');
+    const ctx = canvas.getContext('2d');
+    const size = canvas.parentElement.clientWidth;
+    canvas.width = size * 2; canvas.height = size * 2;
+    ctx.scale(2, 2);
+    ctx.clearRect(0, 0, size, size);
+
+    const mapX = x => (x / 100) * size;
+    const mapY = y => (y / 100) * size;
+
+    const cData = {
+        "head":{ x:50, y:12, shape:'triangle-up' }, "ajna":{ x:50, y:26, shape:'triangle-down' },
+        "throat":{ x:50, y:40, shape:'square' }, "g":{ x:50, y:54, shape:'diamond' },
+        "heart":{ x:67, y:54, shape:'triangle-up-small' }, "sacral":{ x:50, y:68, shape:'square' },
+        "root":{ x:50, y:84, shape:'square' }, "spleen":{ x:23, y:68, shape:'triangle-left' },
+        "solar":{ x:77, y:68, shape:'triangle-right' },
+    };
+
+    // Background
+    const bg = ctx.createRadialGradient(mapX(50), mapY(50), 0, mapX(50), mapY(50), size*0.6);
+    bg.addColorStop(0, 'rgba(20,15,40,0.5)'); bg.addColorStop(1, 'rgba(5,5,16,0.2)');
+    ctx.fillStyle = bg; ctx.fillRect(0, 0, size, size);
+
+    // Channels
+    ctx.strokeStyle = "rgba(100, 116, 139, 0.35)"; ctx.lineWidth = 5;
+    ctx.beginPath();
+    ctx.moveTo(mapX(50), mapY(12)); ctx.lineTo(mapX(50), mapY(84));
+    ctx.moveTo(mapX(23), mapY(68)); ctx.lineTo(mapX(50), mapY(84));
+    ctx.moveTo(mapX(23), mapY(68)); ctx.lineTo(mapX(50), mapY(68));
+    ctx.moveTo(mapX(23), mapY(68)); ctx.lineTo(mapX(50), mapY(40));
+    ctx.moveTo(mapX(77), mapY(68)); ctx.lineTo(mapX(50), mapY(84));
+    ctx.moveTo(mapX(77), mapY(68)); ctx.lineTo(mapX(50), mapY(68));
+    ctx.moveTo(mapX(77), mapY(68)); ctx.lineTo(mapX(50), mapY(40));
+    ctx.moveTo(mapX(67), mapY(54)); ctx.lineTo(mapX(50), mapY(54));
+    ctx.moveTo(mapX(67), mapY(54)); ctx.lineTo(mapX(50), mapY(40));
+    ctx.stroke();
+
+    // Centers
+    centers.forEach(c => {
+        const node = cData[c.id];
+        const x = mapX(node.x); const y = mapY(node.y);
+        const s = mapX(7);
+
+        if (c.defined) {
+            ctx.shadowBlur = 18; ctx.shadowColor = "rgba(191,149,63,0.7)";
+            ctx.fillStyle = "#bf953f"; ctx.strokeStyle = "#fcf6ba";
+        } else {
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = "rgba(15,15,30,0.8)"; ctx.strokeStyle = "#475569";
+        }
+        ctx.lineWidth = 2.5;
+
+        ctx.beginPath();
+        if (node.shape === 'square') ctx.rect(x-s, y-s, s*2, s*2);
+        else if (node.shape === 'diamond') { ctx.moveTo(x, y-s*1.3); ctx.lineTo(x+s*1.3, y); ctx.lineTo(x, y+s*1.3); ctx.lineTo(x-s*1.3, y); }
+        else if (node.shape === 'triangle-up') { ctx.moveTo(x, y-s*1.1); ctx.lineTo(x+s*1.1, y+s*0.9); ctx.lineTo(x-s*1.1, y+s*0.9); }
+        else if (node.shape === 'triangle-up-small') { ctx.moveTo(x, y-s*0.8); ctx.lineTo(x+s*0.8, y+s*0.8); ctx.lineTo(x-s*0.8, y+s*0.8); }
+        else if (node.shape === 'triangle-down') { ctx.moveTo(x-s*1.1, y-s*0.9); ctx.lineTo(x+s*1.1, y-s*0.9); ctx.lineTo(x, y+s*1.1); }
+        else if (node.shape === 'triangle-left') { ctx.moveTo(x+s, y-s); ctx.lineTo(x+s, y+s); ctx.lineTo(x-s, y); }
+        else if (node.shape === 'triangle-right') { ctx.moveTo(x-s, y-s); ctx.lineTo(x+s, y); ctx.lineTo(x-s, y+s); }
+        ctx.closePath(); ctx.fill(); ctx.stroke();
+        ctx.shadowBlur = 0;
+    });
+}
+
+// =============================================
+// CANVAS: ASTROLOGY CHART (Full Esoteric Wheel)
+// =============================================
+function drawAstrologyChart(astroData) {
+    const canvas = document.getElementById('astro-canvas');
+    const ctx = canvas.getContext('2d');
+    const size = canvas.parentElement.clientWidth;
+    canvas.width = size * 2; canvas.height = size * 2;
+    ctx.scale(2, 2);
+    ctx.clearRect(0, 0, size, size);
+
+    const cx = size / 2, cy = size / 2;
+    const rOuter = size * 0.46;   // outer zodiac ring
+    const rZodiac = size * 0.40;  // zodiac symbol ring
+    const rZodiacIn = size * 0.33;// inner zodiac ring
+    const rHouse = size * 0.27;   // house ring
+    const rPlanet = size * 0.20;  // planet zone
+    const rCore = size * 0.08;    // soul core
+
+    // ── Background nebula ──
+    const bgGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, rOuter);
+    bgGrad.addColorStop(0, 'rgba(30,18,58,0.98)');
+    bgGrad.addColorStop(0.5, 'rgba(12,10,28,0.95)');
+    bgGrad.addColorStop(1, 'rgba(4,4,12,0.9)');
+    ctx.fillStyle = bgGrad;
+    ctx.beginPath(); ctx.arc(cx, cy, rOuter, 0, Math.PI*2); ctx.fill();
+
+    // tiny stars inside
+    const rng0 = new DeterministicRandom(hashString('stars'));
+    for (let i = 0; i < 40; i++) {
+        const a = rng0.next() * Math.PI * 2;
+        const r = rng0.next() * rCore * 3;
+        ctx.fillStyle = `rgba(255,255,255,${0.1 + rng0.next()*0.4})`;
+        ctx.beginPath(); ctx.arc(cx + Math.cos(a)*r, cy + Math.sin(a)*r, rng0.next()*1.2+0.3, 0, Math.PI*2); ctx.fill();
+    }
+
+    // ── Outer gold ring ──
+    ctx.shadowBlur = 20; ctx.shadowColor = 'rgba(191,149,63,0.9)';
+    ctx.strokeStyle = '#bf953f'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.arc(cx, cy, rOuter, 0, Math.PI*2); ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    // ── Zodiac band background ──
+    const elementColors = ['rgba(255,80,80,0.12)','rgba(80,220,120,0.12)','rgba(255,220,60,0.12)','rgba(80,160,255,0.12)'];
+    const elementNames  = ['Feu','Terre','Air','Eau'];
+    for (let i = 0; i < 12; i++) {
+        const a1 = (i * 30 - 90) * Math.PI / 180;
+        const a2 = ((i+1) * 30 - 90) * Math.PI / 180;
+        ctx.beginPath();
+        ctx.moveTo(cx + Math.cos(a1)*rZodiacIn, cy + Math.sin(a1)*rZodiacIn);
+        ctx.arc(cx, cy, rOuter, a1, a2);
+        ctx.arc(cx, cy, rZodiacIn, a2, a1, true);
+        ctx.closePath();
+        ctx.fillStyle = elementColors[i % 4];
+        ctx.fill();
+    }
+
+    // ── Zodiac inner/outer boundary rings ──
+    ctx.strokeStyle = 'rgba(191,149,63,0.55)'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.arc(cx, cy, rZodiacIn, 0, Math.PI*2); ctx.stroke();
+    ctx.strokeStyle = 'rgba(191,149,63,0.25)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.arc(cx, cy, rHouse, 0, Math.PI*2); ctx.stroke();
+
+    // ── Zodiac sector dividers ──
+    ctx.strokeStyle = 'rgba(191,149,63,0.35)'; ctx.lineWidth = 1;
+    for (let i = 0; i < 12; i++) {
+        const angle = (i * 30 - 90) * Math.PI / 180;
+        ctx.beginPath();
+        ctx.moveTo(cx + Math.cos(angle)*rZodiacIn, cy + Math.sin(angle)*rZodiacIn);
+        ctx.lineTo(cx + Math.cos(angle)*rOuter, cy + Math.sin(angle)*rOuter);
+        ctx.stroke();
+    }
+
+    // ── Zodiac symbols ──
+    ctx.font = `${size*0.07}px sans-serif`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    const zodiacSymbols = ZODIAC.map(z => z.symbol);
+    for (let i = 0; i < 12; i++) {
+        const midAngle = ((i * 30 + 15) - 90) * Math.PI / 180;
+        const rx = cx + Math.cos(midAngle) * (rZodiacIn + (rOuter - rZodiacIn) * 0.5);
+        const ry = cy + Math.sin(midAngle) * (rZodiacIn + (rOuter - rZodiacIn) * 0.5);
+        ctx.shadowBlur = 8; ctx.shadowColor = elementColors[i%4].replace('0.12','0.8');
+        ctx.fillStyle = '#fff';
+        ctx.fillText(zodiacSymbols[i], rx, ry);
+    }
+    ctx.shadowBlur = 0;
+
+    // ── Zodiac sign names (tiny) ──
+    ctx.font = `bold ${size*0.028}px sans-serif`;
+    ctx.fillStyle = 'rgba(255,255,255,0.55)';
+    for (let i = 0; i < 12; i++) {
+        const midAngle = ((i * 30 + 15) - 90) * Math.PI / 180;
+        const rx = cx + Math.cos(midAngle) * (rZodiacIn - 10);
+        const ry = cy + Math.sin(midAngle) * (rZodiacIn - 10);
+        ctx.save(); ctx.translate(rx, ry); ctx.rotate(midAngle + Math.PI/2);
+        ctx.fillText(ZODIAC[i].sign, 0, 0);
+        ctx.restore();
+    }
+
+    // ── House dividers (12 houses) ──
+    const houseColors = ['rgba(255,200,60,0.6)','rgba(255,200,60,0.3)','rgba(255,200,60,0.3)','rgba(180,220,255,0.6)','rgba(180,220,255,0.3)','rgba(180,220,255,0.3)','rgba(255,200,60,0.6)','rgba(255,200,60,0.3)','rgba(255,200,60,0.3)','rgba(180,220,255,0.6)','rgba(180,220,255,0.3)','rgba(180,220,255,0.3)'];
+    const houseAngles = [0,30,60,90,120,150,180,210,240,270,300,330];
+    const rngH = new DeterministicRandom(hashString(astroData.ascendant.sign+'house'));
+    const ascendantSignIndex = ZODIAC.findIndex(z => z.sign === astroData.ascendant.sign);
+    for (let i = 0; i < 12; i++) {
+        const hAngle = ((houseAngles[i] + ascendantSignIndex * 30) - 90) * Math.PI / 180;
+        const isAngular = i % 3 === 0;
+        ctx.strokeStyle = isAngular ? 'rgba(191,149,63,0.7)' : 'rgba(191,149,63,0.25)';
+        ctx.lineWidth = isAngular ? 2 : 0.8;
+        ctx.beginPath();
+        ctx.moveTo(cx + Math.cos(hAngle)*rCore, cy + Math.sin(hAngle)*rCore);
+        ctx.lineTo(cx + Math.cos(hAngle)*rZodiacIn, cy + Math.sin(hAngle)*rZodiacIn);
+        ctx.stroke();
+
+        // house numbers
+        const midH = ((houseAngles[i] + 15 + ascendantSignIndex * 30) - 90) * Math.PI / 180;
+        const hrx = cx + Math.cos(midH) * (rHouse * 0.65);
+        const hry = cy + Math.sin(midH) * (rHouse * 0.65);
+        ctx.font = `${size*0.028}px sans-serif`;
+        ctx.fillStyle = isAngular ? 'rgba(255,215,0,0.7)' : 'rgba(255,255,255,0.3)';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(`${i+1}`, hrx, hry);
+    }
+
+    // ── Angular house labels ──
+    const angularLabels = ['ASC','IC','DSC','MC'];
+    for (let i = 0; i < 4; i++) {
+        const hAngle = ((i * 90 + ascendantSignIndex * 30) - 90) * Math.PI / 180;
+        const lx = cx + Math.cos(hAngle) * (rZodiacIn + 12);
+        const ly = cy + Math.sin(hAngle) * (rZodiacIn + 12);
+        ctx.font = `bold ${size*0.028}px sans-serif`;
+        ctx.fillStyle = '#fde047'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(angularLabels[i], lx, ly);
+    }
+
+    // ── Soul core ──
+    const rayColors = { 1:'#ef4444', 2:'#3b82f6', 3:'#10b981', 4:'#f59e0b', 5:'#8b5cf6', 6:'#ec4899', 7:'#06b6d4' };
+    const coreColor = rayColors[astroData.soulRay.num] || '#bf953f';
+    const coreGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, rCore);
+    coreGrad.addColorStop(0, coreColor + 'aa');
+    coreGrad.addColorStop(0.5, 'rgba(10,8,25,0.9)');
+    coreGrad.addColorStop(1, 'rgba(5,5,16,0.95)');
+    ctx.shadowBlur = 25; ctx.shadowColor = coreColor;
+    ctx.fillStyle = coreGrad;
+    ctx.beginPath(); ctx.arc(cx, cy, rCore, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle = coreColor; ctx.lineWidth = 2; ctx.stroke();
+    ctx.fillStyle = coreColor;
+    ctx.font = `${size*0.055}px sans-serif`; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('✦', cx, cy);
+    ctx.shadowBlur = 0;
+
+    // ── Planet placement function ──
+    const planetRingRadius = rHouse * 0.78;
+    const placedAngles = [];
+    const drawPlanet = (signObj, symbol, color, label, ringOffset) => {
+        const signIndex = ZODIAC.findIndex(z => z.sign === signObj.sign);
+        const rngP = new DeterministicRandom(hashString(signObj.sign + symbol + label));
+        let baseAngle = ((signIndex * 30 + rngP.nextInt(4, 26)) - 90) * Math.PI / 180;
+
+        // avoid overlap
+        let attempts = 0;
+        while (attempts < 12 && placedAngles.some(a => Math.abs(a - baseAngle) < 0.22)) {
+            baseAngle += 0.25; attempts++;
+        }
+        placedAngles.push(baseAngle);
+
+        const pr = planetRingRadius + (ringOffset || 0);
+        const px = cx + Math.cos(baseAngle) * pr;
+        const py = cy + Math.sin(baseAngle) * pr;
+
+        // connecting line (aspect line from center)
+        ctx.strokeStyle = color + '44'; ctx.lineWidth = 1; ctx.globalAlpha = 0.6;
+        ctx.setLineDash([3,5]);
+        ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(px, py); ctx.stroke();
+        ctx.setLineDash([]); ctx.globalAlpha = 1;
+
+        // planet orb
+        const orbR = size * 0.048;
+        ctx.shadowBlur = 14; ctx.shadowColor = color;
+        ctx.fillStyle = 'rgba(5,5,16,0.92)';
+        ctx.beginPath(); ctx.arc(px, py, orbR, 0, Math.PI*2); ctx.fill();
+        ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.stroke();
+
+        // planet symbol
+        ctx.shadowBlur = 10; ctx.shadowColor = color;
+        ctx.fillStyle = '#ffffff';
+        ctx.font = `${size*0.055}px sans-serif`; ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.fillText(symbol, px, py + 1);
+
+        // planet label
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = color;
+        ctx.font = `bold ${size*0.025}px sans-serif`;
+        ctx.fillText(label, px, py - orbR - 5);
+    };
+
+    // ── Draw all planets ──
+    drawPlanet(astroData.sun,       '☉', '#fde047', 'Soleil',  0);
+    drawPlanet(astroData.moon,      '☽', '#93c5fd', 'Lune',    8);
+    drawPlanet(astroData.northNode, '☊', '#34d399', 'N.Nord', -6);
+    drawPlanet(astroData.southNode, '☋', '#94a3b8', 'N.Sud',   4);
+
+    // Extra planets from RNG
+    const rngE = new DeterministicRandom(hashString(astroData.ascendant.sign + astroData.sun.sign));
+    const extraPlanets = [
+        { sym:'♄', color:'#94a3b8', label:'Saturne', sign: ZODIAC[rngE.nextInt(0,11)] },
+        { sym:'♃', color:'#f97316', label:'Jupiter', sign: ZODIAC[rngE.nextInt(0,11)] },
+        { sym:'♂', color:'#ef4444', label:'Mars',    sign: ZODIAC[rngE.nextInt(0,11)] },
+        { sym:'♀', color:'#ec4899', label:'Vénus',   sign: ZODIAC[rngE.nextInt(0,11)] },
+    ];
+    extraPlanets.forEach((p, i) => drawPlanet(p.sign, p.sym, p.color, p.label, i * 3 - 5));
+
+    // ── Aspect lines between main planets ──
+    const mainPositions = [];
+    [astroData.sun, astroData.moon, astroData.northNode].forEach((s, idx) => {
+        const sIdx = ZODIAC.findIndex(z => z.sign === s.sign);
+        mainPositions.push({ angle: ((sIdx * 30 + 15) - 90) * Math.PI/180, color: ['#fde047','#93c5fd','#34d399'][idx] });
+    });
+    const aspectAngles = [0, 60, 90, 120, 180];
+    const aspectColors = ['rgba(255,220,0,0.5)','rgba(120,200,255,0.4)','rgba(255,100,100,0.4)','rgba(100,255,150,0.5)','rgba(255,150,80,0.4)'];
+    for (let i = 0; i < mainPositions.length; i++) {
+        for (let j = i+1; j < mainPositions.length; j++) {
+            let diff = Math.abs(mainPositions[i].angle - mainPositions[j].angle) * 180 / Math.PI;
+            if (diff > 180) diff = 360 - diff;
+            const aspectIdx = aspectAngles.findIndex(a => Math.abs(diff - a) < 15);
+            if (aspectIdx >= 0) {
+                const r = planetRingRadius;
+                const p1x = cx + Math.cos(mainPositions[i].angle) * r;
+                const p1y = cy + Math.sin(mainPositions[i].angle) * r;
+                const p2x = cx + Math.cos(mainPositions[j].angle) * r;
+                const p2y = cy + Math.sin(mainPositions[j].angle) * r;
+                ctx.strokeStyle = aspectColors[aspectIdx]; ctx.lineWidth = 1.2;
+                ctx.setLineDash([4,4]); ctx.globalAlpha = 0.5;
+                ctx.beginPath(); ctx.moveTo(p1x, p1y); ctx.lineTo(p2x, p2y); ctx.stroke();
+                ctx.setLineDash([]); ctx.globalAlpha = 1;
+            }
+        }
+    }
+
+    // ── Ascendant beam ──
+    const ascAngle = ((ascendantSignIndex * 30) - 90) * Math.PI / 180;
+    ctx.shadowBlur = 18; ctx.shadowColor = '#f87171';
+    ctx.strokeStyle = '#f87171'; ctx.lineWidth = 2.5;
+    ctx.beginPath(); ctx.moveTo(cx + Math.cos(ascAngle)*rCore, cy + Math.sin(ascAngle)*rCore);
+    ctx.lineTo(cx + Math.cos(ascAngle)*rZodiacIn, cy + Math.sin(ascAngle)*rZodiacIn); ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    // ── Legend below chart ──
+    // draw legend inside canvas at bottom
+    const legendY = cy + rOuter + 18;
+    const legendItems = [
+        { color:'#fde047', sym:'☉', label:'Soleil' },
+        { color:'#93c5fd', sym:'☽', label:'Lune' },
+        { color:'#f87171', sym:'↑', label:'Asc.' },
+        { color:'#34d399', sym:'☊', label:'N.Nord' },
+        { color:coreColor, sym:'✦', label:`Rayon ${astroData.soulRay.num}` },
+    ];
+    ctx.font = `${size*0.028}px sans-serif`;
+    const legendTotalW = legendItems.length * 68;
+    let lx = cx - legendTotalW/2 + 30;
+    legendItems.forEach(item => {
+        ctx.shadowBlur = 6; ctx.shadowColor = item.color;
+        ctx.fillStyle = item.color;
+        ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+        ctx.fillText(item.sym + ' ' + item.label, lx, legendY);
+        ctx.shadowBlur = 0;
+        lx += 68;
+    });
+}
+// =============================================
+// PWA: SERVICE WORKER REGISTRATION
+// =============================================
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(err => console.log('SW registration failed:', err));
+    });
+}
+</script>
+</body>
+</html>
